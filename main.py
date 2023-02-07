@@ -12,6 +12,7 @@
 def main():
     print('Todo')
     print('test discord link')
+    print('hello')
 
 
 if __name__ == '__main__':
