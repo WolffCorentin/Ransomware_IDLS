@@ -10,10 +10,46 @@
 # Importations
 # --------------------------------------------
 import socket
-import sys
 # --------------------------------------------
 # Functions
 # --------------------------------------------
+
+
+def start_key_server(host, port):
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        server.bind((host, port))
+        server.listen(1)
+
+        client, adressClient = server.accept()
+        print(f'Connexion de {adressClient}')
+
+        data = client.recv(1024)
+        if not data:
+            print(f'Erreur de réception')
+        else:
+            print(f'Reception de : {data}')
+
+            response = data.upper()
+            print(f'Envoi de {response}')
+            n = client.send(response)
+            if (n != len(response)):
+                print("Erreur d'envoi")
+            else:
+                print(f'Envoi ok')
+
+        print(f'Fermeture de la connexion avec le Client.')
+        client.close()
+        print(f'Arret dy serveur.')
+    server.close()
+
+
+def test_server(host, port):
+    conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    conn.connect((host, port))
+    data = conn.recv(1024)
+    print(f'Received {data}')
+
 
 
 def check_packet_validity(header, message):
@@ -27,4 +63,3 @@ def check_packet_validity(header, message):
     :rtype: bool
     """
     return message[9:9+header]
-
