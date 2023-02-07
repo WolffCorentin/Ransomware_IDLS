@@ -10,6 +10,7 @@
 
 def main():
     print('Todo')
+    print('test discord link')
 
 
 if __name__ == '__main__':
