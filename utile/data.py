@@ -74,8 +74,6 @@ def change_state(victim_id, state):
     conn.commit()
     conn.close()
 
-history_req(1)
-list_victim()
 
 '''
 # insert fake victims data
