@@ -33,14 +33,11 @@ def main():
 
 def listing():
     """ Send msg to TCP server which will interpret IT and give a feed-back"""
-    msg = input(b'Client : Entrez un message ou STOP pour arreter : ')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(("localhost", 8380))
-    while msg != b"STOP":
-        s.send(bytes(msg, 'utf-8'))
-        data = s.recv(2048)
-        print('Réception de données de la part du serveur : ' + str(data))
-        msg = input("Réponse ou STOP pour sortir : ")
+    s.send(bytes("1", 'utf-8'))
+    data = s.recv(2048)
+    print('Réception de données de la part du serveur : ' + str(data))
     s.close()
 
 

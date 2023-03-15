@@ -37,10 +37,20 @@ class server_tcp(object):
         self.s.listen(10)
         conn, addr = self.s.accept()
         print(f'[+] New TCP Connexion from ' + str(addr[0])+":"+str(addr[1]))
+        # Implémentation sécurité : AES
+        # Send msg without coding syntax so we can read next informations
+        secu = security.SecurityLayer("Here's the key informations")
+        key = secu.key
+        nonce = secu.nonce
+        tag = secu.authTag
+        #conn.send(bytes(str(key), 'utf-8'))
+        #conn.send(bytes(str(nonce), 'utf-8'))
+        #conn.send(bytes(str(tag), 'utf-8'))
         while 1:
             msg = conn.recv(2048)
             print(str(addr[0]) + " >> " + str(msg))
             rs = str(self.gestion_msg(msg))
+            # @Todo: Build header & send it before msg
             conn.send(bytes(rs, 'utf-8'))
 
 
