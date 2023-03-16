@@ -8,6 +8,7 @@
 
 # --------------------------------------------
 import socket
+import utile.configgetter as config
 def main():
     """ Console de contrôle """
     # Key server start
@@ -18,7 +19,7 @@ def main():
           '\n3) Renseigner le paiement de rançon d''une victime'
           '\n4) Quitter')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("localhost", 8382))
+    s.connect((config.get_ip("config.json"), config.get_port("config.json")))
     choix = "19"
     while choix != '4':
         choix = input('Votre choix : ')
@@ -35,36 +36,13 @@ def main():
             data_h = s.recv(2048).decode()
             print('Réception de données de la part du serveur : ' + str(data_h))
         elif choix == '3':
+            # Todo Fill payload
+
             print(fill_payload())
         elif choix == '4':
             print('Bonne journée')
             s.close()
             break
-
-
-def listing():
-    """ Send msg to TCP server which will interpret IT and give a feed-back"""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("localhost", 8382))
-    s.send(bytes("1", 'utf-8'))
-    data = s.recv(2048).decode()
-    s.close()
-    print('Réception de données de la part du serveur : ' + str(data))
-
-
-
-def history():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("localhost", 8382))
-    s.send(bytes("2", 'utf-8'))
-    data = s.recv(2048).decode()
-    print('Réception de données de la part du serveur : ' + str(data))
-    id = input('Merci de préciser un ID pour consulter l''historique : ')
-    s.send(bytes(id, 'utf-8'))
-    data_h = s.recv(2048).decode()
-    print('Réception de données de la part du serveur : ' + str(data_h))
-    s.close()
-
 
 def fill_payload():
     return 'Todo payload'
