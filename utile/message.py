@@ -59,8 +59,3 @@ def state(key1, val1, key2, val2):
     title_json = json.dumps(title)
 
     return title_json
-
-print(response('VICTIM', 'id', 'HASH', 'hash', 'OS','type','DISKS','disks','STATE','state'))
-print(req('LIST_REQ', None))
-print(end('LIST_END', None))
-print(state('CHGSTATE', 'id', 'STATE', 'DECRYPT'))
