@@ -36,11 +36,17 @@ def insert_victim(victim):
     # Connection DB
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
+    listing = ""
 
     c.execute('INSERT INTO victims VALUES (?, ?, ?, ?,?)', [victim[0], victim[2], victim[1], victim[3], None])
 
+    rows = c.fetchall()
+
+    for row in rows:
+        listing += row
     conn.commit()
     conn.close()
+    return listing
 
 
 def history_req(victim_id):

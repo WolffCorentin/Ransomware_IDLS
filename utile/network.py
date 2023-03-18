@@ -79,12 +79,14 @@ class server_tcp(object):
             # On demande un ID en particulier pour une recherche d'historique
             c.send(bytes('Please provide an user ID for the history', 'utf-8'))
             # On attends l'ID en écoutant sur le serveur frontale
-            id = c.recv(1024).decode()
+            id = c.recv(2048).decode()
             # On envoie l'historique
             return udata.history_req(id)
         elif message == '3':
             # C'est à faire
             return "Todo3"
+        elif message == '4':
+            return 'Thanks you, good bye.'
 
     def threaded(self, c, sc):
         """
@@ -92,19 +94,14 @@ class server_tcp(object):
         """
         print('New thread started')
         while True:
-            try:
-                # On écoute
-                data = c.recv(1024).decode()
-            except:
-                print('Connexion closed. Kicking it out.')
-                break
+            data = c.recv(2048).decode()
             if not data:
-                print('Bye')
+                print(sc[0] + ':' + str(sc[1]) + ' >> connexion closed.')
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
                 print_lock.release()
                 break
             # On print l'ip de la connexion et sa demande
-            print(str(sc[0] + " >> " + data))
+            print(str(sc[0] + ':' + str(sc[1]) + " >> " + data))
             # On construit une réponse grâce à la méthode gestion message
             rs = str(self.gestion_msg(c, data))
             # @Todo: Build header & send it before msg
