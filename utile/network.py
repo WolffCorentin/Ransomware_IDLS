@@ -33,7 +33,6 @@ class server_tcp(object):
         """
         self.ip = ip
         self.port = port
-        self.encryptkey = os.urandom(32)
 
     def start_server(self):
         """
@@ -93,6 +92,13 @@ class server_tcp(object):
         Système de création de Threads..
         """
         print('New thread started')
+        print('[SecurityLayerAES]Generating Security Parameters...')
+        # On initialise un protocole de sécurité AES par thread pour
+        # Sécurisé de manière différente (différents nonce, key, authtag)
+        # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
+        # tcp avec des keys d'autres connexions...
+        sec = security.SecurityLayer()
+        # Todo: Mettre en place le cryptage
         while True:
             data = c.recv(2048).decode()
             if not data:
@@ -106,7 +112,7 @@ class server_tcp(object):
             rs = str(self.gestion_msg(c, data))
             # @Todo: Build header & send it before msg
             # On l'envoie
-            c.send(bytes(rs, 'utf-8'))
+            c.send(bytes(str(rs),encoding='utf-8'))
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 

@@ -8,8 +8,11 @@
 
 # --------------------------------------------
 import socket
-from socket import SHUT_RDWR
+from utile import security
 import utile.configgetter as config
+
+sec = security.SecurityLayer()
+
 def main():
     """ Console de contrôle """
     # Key server start
@@ -33,7 +36,8 @@ def main():
             # Lui va interroger la DB Sqlite
             s.send(bytes("1", 'utf-8'))
             # On récupère la réponse en écoutant
-            data = s.recv(2048).decode()
+            data = s.recv(2048)
+            data = sec.decrypt(data)
             # Et on l'envoie...
             print('Réception de données de la part du serveur : ' + str(data))
         elif choix == '2':

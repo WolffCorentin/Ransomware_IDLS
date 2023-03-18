@@ -1,4 +1,5 @@
 # --------------------------------------------
+import random
 
 # Ransomware Project for educational purposes
 # Course : Security integration
@@ -10,7 +11,7 @@
 # Importations
 # --------------------------------------------
 from Cryptodome.Cipher import AES
-import binascii, os
+import binascii, os, random
 
 
 # --------------------------------------------
@@ -18,28 +19,35 @@ import binascii, os
 # --------------------------------------------
 class SecurityLayer(object):
 
-    def __init__(self, text):
+    def __init__(self):
         self.cipher = None
-        self.text = text
-        self.nonce = ""
+        self.text = ""
+        self.nonce = self.gen_nonce()
         self.authTag = ""
-        self.key = os.urandom(32)
+        self.key = self.gen_key()
         print('Encryption key: ', binascii.hexlify(self.key))
 
-    def encrypt(self):
+    def gen_key(self):
+        return os.urandom(32)
+
+    def gen_nonce(self):
+        return random.randint(1, 100)
+
+    def encrypt(self, text):
+        self.text = text
         self.cipher = AES.new(self.key, AES.MODE_GCM)
-        self.ciphertext, self.authTag = self.cipher.encrypt_and_digest(self.text)
-        return self.ciphertext, self.cipher.nonce, self.authTag
+        self.ciphertext, self.authTag = self.cipher.encrypt_and_digest(bytes(text, 'utf-8'))
+        return (self.ciphertext, self.authTag, self.cipher.nonce)
 
-
-    def decrypt(self):
+    def decrypt(self, ciphertext):
         if self.cipher is not None:
-            (ciphertext, self.nonce, self.authTag) = self.ciphertext
-            aesCipher = AES.new(self.key, AES.MODE_GCM, self.nonce)
-            plainText = aesCipher.decrypt_and_verify(ciphertext, self.authTag)
+            (ciphertext, authTag, nonce) = ciphertext
+            aesCipher = AES.new(self.key, AES.MODE_GCM, nonce)
+            plainText = aesCipher.decrypt_and_verify(ciphertext, authTag)
             return plainText
         else:
             return f"You need to encrypt before trying to decrypt"
+
 # --------------------------------------------
 # Functions
 # --------------------------------------------
