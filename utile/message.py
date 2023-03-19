@@ -23,10 +23,9 @@ def list_victim_req():
 
     return ljson
 
-def list_victim_resp(id, hash, os, disks, state, nb_files):
+def list_victim_resp(id, os, disks, state, nb_files):
     list_victim_resp = {
         'VICTIM': id,
-        'HASH': hash,
         'OS': os,
         'DISKS': disks,
         'STATE': state,

