@@ -1,4 +1,5 @@
 {
-  "server": "localhost",
-  "port": 8381
+  "server_ip": "localhost",
+  "port_server": 8380,
+  "second_port_server": 8381
 }

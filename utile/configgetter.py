@@ -14,7 +14,7 @@ def get_ip(path):
         confile.close()
 
     # On renvoie la donnée server (l'ip)
-    return data['server']
+    return data['server_ip']
 
 
 def get_port(path):
@@ -30,4 +30,19 @@ def get_port(path):
         # Et éviter de futures conflicts
         confile.close()
     # On renvoie la donnée port
-    return data['port']
+    return data['port_server']
+
+def get_specific_data(path, cdata):
+    """
+        Fonction pour récupérer des données en configuration
+        (config en json)
+        """
+    # On ouvre la config en mode lecture
+    with open(path, "r") as confile:
+        # On récupère les data grâce à l'api json
+        data = json.load(confile)
+        # On ferme le fichier pour des questions de propreté
+        # Et éviter de futures conflicts
+        confile.close()
+    # On renvoie la donnée port
+    return data[cdata]
