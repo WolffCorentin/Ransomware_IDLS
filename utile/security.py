@@ -23,7 +23,6 @@ class SecurityLayer(object):
         self.cipher = None
         self.key = self.gen_key()
         self.cipher = AES.new(self.key, AES.MODE_GCM)
-        print('Encryption key: ', binascii.hexlify(self.key))
 
     def gen_key(self):
         return os.urandom(32)

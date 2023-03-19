@@ -30,6 +30,8 @@ def main():
     s.connect((config.get_ip("config.json"), config.get_port("config.json")))
     # 19 ainsi il est initalisé à une variable impossible à atteindre
     choix = "19"
+    get_keys = s.recv(2048)
+    print('$ Server : ' + str(get_keys))
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
         choix = input('Votre choix : ')
@@ -40,14 +42,14 @@ def main():
             # On récupère la réponse en écoutant
             data = s.recv(2048)
             # Et on l'envoie...
-            print('Réception de données de la part du serveur : ' + str(data))
+            print('$ Server : ' + str(data))
         elif choix == '2':
             # On demande au serveur frontale l'historique d'une victime
             s.send(bytes("2", 'utf-8'))
             # On écoute la réponse...
             data = s.recv(2048).decode()
             # Le serveur nous réponds, il demande un ID victime.
-            print('Réception de données de la part du serveur : ' + str(data))
+            print('$ Server : ' + str(data))
             # On construit un input pour demander à l'utilisateur l'ID
             id = input('Merci de préciser un ID pour consulter l''historique : ')
             # On transmet l'ID au serveur frontale
@@ -55,7 +57,7 @@ def main():
             # On écoute la réponse
             data_h = s.recv(2048).decode()
             # On reçoit l'historique...
-            print('Réception de données de la part du serveur : ' + str(data_h))
+            print('$ Server : ' + str(data_h))
         elif choix == '3':
             # Todo Fill payload
             # C'est à faire
@@ -66,7 +68,7 @@ def main():
             # Afin de garder des traces (logs)
             s.send(bytes("4", 'utf-8'))
             data = s.recv(2048).decode()
-            print('Réception de données de la part du serveur : ' + str(data))
+            print('$ Server : ' + str(data))
             # On break et la connexion se ferme en sortant du break
             break
     s.close()

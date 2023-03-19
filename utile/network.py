@@ -55,7 +55,7 @@ class server_tcp(object):
             print_lock.acquire()
             print(f'[+] New TCP Connexion from ' + str(addr[0]) + ":" + str(addr[1]))
             # Nouvelle connexion détectée : On créé un thread pour celle-ci
-            start_new_thread(self.threaded, (conn,addr))
+            start_new_thread(self.threaded, (conn, addr))
         # Implémentation sécurité : AES
         # conn.send(bytes(str(key), 'utf-8'))
         # conn.send(bytes(str(nonce), 'utf-8'))
@@ -98,7 +98,8 @@ class server_tcp(object):
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
         sec = security.SecurityLayer()
-        print(str(sec.showValues()))
+        c.send(bytes(sec.showValues(), 'utf-8'))
+        print(sec.showValues())
         # Todo: Mettre en place le cryptage
         while True:
             data = c.recv(2048).decode()
