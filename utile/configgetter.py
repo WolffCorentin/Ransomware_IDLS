@@ -1,4 +1,21 @@
+# --------------------------------------------
+
+# Ransomware Project for educational purposes
+# Course : Security integration
+# Bloc : 1
+# Group : IS4
+# Class : configgbetter
+# Purpose : Stop hardcoding on server-setup, use json config
+
+# --------------------------------------------
+# Importations
+# --------------------------------------------
+
 import json
+
+# --------------------------------------------
+# Classes & Functions
+# --------------------------------------------
 
 def get_ip(path):
     """

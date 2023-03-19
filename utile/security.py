@@ -1,5 +1,4 @@
 # --------------------------------------------
-import random
 
 # Ransomware Project for educational purposes
 # Course : Security integration
@@ -11,11 +10,11 @@ import random
 # Importations
 # --------------------------------------------
 from Cryptodome.Cipher import AES
-import binascii, os, random
+import binascii, os
 
 
 # --------------------------------------------
-# CLasses
+# Classes
 # --------------------------------------------
 class SecurityLayer(object):
 
