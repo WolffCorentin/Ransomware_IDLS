@@ -78,3 +78,11 @@ def change_state(id, state):
     csjson = json.dumps(change_state)
 
     return csjson
+
+def close_connexion():
+    close_connexion = {
+        'CLOSE_TCP': None
+    }
+    ccjson = json.dumps(close_connexion)
+
+    return ccjson

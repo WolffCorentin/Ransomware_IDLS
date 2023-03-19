@@ -133,9 +133,10 @@ for i, history in enumerate(fake_histories):
 '''
 # commit the changes and close the connection
 
-
+'''
 lv = list_victim()
 for ent in lv:
     msg_builder = message.list_victim_resp(ent[0], ent[1], ent[3], ent[2], ent[4])
     print(msg_builder)
 print(message.list_victim_end())
+'''

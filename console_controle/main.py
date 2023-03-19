@@ -10,6 +10,7 @@
 import socket
 from utile import security
 import utile.configgetter as config
+from utile import message
 
 def main():
     """ Console de contrôle """
@@ -42,7 +43,8 @@ def main():
             hasAsked = True
             # On demande au serveur frontale de lister les victimes
             # Lui va interroger la DB Sqlite
-            s.send(bytes("1", 'utf-8'))
+            d = message.list_victim_req()
+            s.send(bytes(d, 'utf-8'))
             # On récupère la réponse en écoutant
             data = s.recv(2048)
             # Et on l'envoie...
@@ -50,15 +52,11 @@ def main():
         elif choix == '2':
             if hasAsked:
                 # On demande au serveur frontale l'historique d'une victime
-                s.send(bytes("2", 'utf-8'))
-                # On écoute la réponse...
-                data = s.recv(2048).decode()
-                # Le serveur nous réponds, il demande un ID victime.
-                print('$ Server : ' + str(data))
                 # On construit un input pour demander à l'utilisateur l'ID
                 id = input('Merci de préciser un ID pour consulter l''historique : ')
                 # On transmet l'ID au serveur frontale
-                s.send(bytes(str(id), 'utf-8'))
+                d = message.history_req(id)
+                s.send(bytes(str(d), 'utf-8'))
                 # On écoute la réponse
                 data_h = s.recv(2048).decode()
                 # On reçoit l'historique...
@@ -73,7 +71,7 @@ def main():
             # On ferme la connexion et quitte la console de contrôle
             # On prévient le serveur qu'on ferme la connexion avant de la fermer
             # Afin de garder des traces (logs)
-            s.send(bytes("4", 'utf-8'))
+            s.send(bytes(message.close_connexion(), 'utf-8'))
             data = s.recv(2048).decode()
             print('$ Server : ' + str(data))
             # On break et la connexion se ferme en sortant du break
