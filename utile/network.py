@@ -98,6 +98,7 @@ class server_tcp(object):
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
         sec = security.SecurityLayer()
+        print(str(sec.showValues()))
         # Todo: Mettre en place le cryptage
         while True:
             data = c.recv(2048).decode()
@@ -112,7 +113,7 @@ class server_tcp(object):
             rs = str(self.gestion_msg(c, data))
             # @Todo: Build header & send it before msg
             # On l'envoie
-            c.send(bytes(str(rs),encoding='utf-8'))
+            c.send(bytes(str(rs), encoding='utf-8'))
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 

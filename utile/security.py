@@ -21,21 +21,15 @@ class SecurityLayer(object):
 
     def __init__(self):
         self.cipher = None
-        self.text = ""
-        self.nonce = self.gen_nonce()
-        self.authTag = ""
         self.key = self.gen_key()
+        self.cipher = AES.new(self.key, AES.MODE_GCM)
         print('Encryption key: ', binascii.hexlify(self.key))
 
     def gen_key(self):
         return os.urandom(32)
 
-    def gen_nonce(self):
-        return random.randint(1, 100)
-
     def encrypt(self, text):
         self.text = text
-        self.cipher = AES.new(self.key, AES.MODE_GCM)
         self.ciphertext, self.authTag = self.cipher.encrypt_and_digest(bytes(text, 'utf-8'))
         return (self.ciphertext, self.authTag, self.cipher.nonce)
 
@@ -48,6 +42,9 @@ class SecurityLayer(object):
         else:
             return f"You need to encrypt before trying to decrypt"
 
+
+    def showValues(self):
+        return "Key : " + str(binascii.hexlify(self.key)) + ", Nonce : " + str(binascii.hexlify(self.cipher.nonce))
 # --------------------------------------------
 # Functions
 # --------------------------------------------
