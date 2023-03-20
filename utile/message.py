@@ -86,3 +86,40 @@ def close_connexion():
     ccjson = json.dumps(close_connexion)
 
     return ccjson
+
+def initialize_req(hash, os, disks):
+    initialize_req = {
+        'INITIALIZE': hash,
+        'OS': os,
+        'DISKS': disks
+    }
+    irjson = json.dumps(initialize_req)
+
+    return irjson
+
+def initialize_key(id, key, state):
+    initialize_key = {
+        'KEY_RESP': id,
+        'KEY': key,
+        'STATE': state
+    }
+    ikjson = json.dumps(initialize_key)
+
+    return ikjson
+
+def initialize_resp(id, disks, paths, file_exit, freq, key, state):
+    initialize_resp = {
+        'CONFIGURE': id,
+        'SETTING': {
+            'DISKS': disks,
+            'PATHS': paths,
+            'FILE_EXIT': file_exit,
+            'FREQ': freq,
+            'KEY': key,
+            'STATE': state
+        }
+    }
+    irjson = json.dumps(initialize_resp)
+
+    return irjson
+

