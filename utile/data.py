@@ -1,6 +1,9 @@
 import sqlite3
 import message
+import configgetter
 from datetime import datetime
+
+conf = configgetter.get_specific_data("../config.json", "victim_database")
 
 DB_FILENAME = '../serveur_cles/data/victims.sqlite'
 
@@ -88,6 +91,7 @@ def insert_victim_new(os, hash, disks, key):
 
 def history_req(victim_id):
     # Connection DB
+    # Todo: Only 1 ID working. Check decrypted too !
     conn = sqlite3.connect(DB_FILENAME)
     c = conn.cursor()
     history = []
@@ -141,3 +145,5 @@ for ent in lv:
     print(msg_builder)
 print(message.list_victim_end())
 '''
+
+print(history_req('2'))
