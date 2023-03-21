@@ -11,6 +11,7 @@ import random
 # Importations
 # --------------------------------------------
 from Cryptodome.Cipher import AES
+from Cryptodome.Random import get_random_bytes
 import binascii, os
 
 
@@ -25,7 +26,7 @@ class SecurityLayer(object):
         self.cipher = AES.new(self.key, AES.MODE_GCM)
 
     def gen_key(self):
-        return random.randbytes(16)
+        return get_random_bytes(16)
 
     def encrypt(self, text):
         self.text = text

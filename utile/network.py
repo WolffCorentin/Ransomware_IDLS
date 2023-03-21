@@ -112,7 +112,7 @@ class server_tcp(object):
             # @Todo: Build header & send it before msg
             r = sec.encrypt(bytes(rs.encode('utf-8')))
             # On l'envoie
-            c.send(bytes(str(r), encoding='utf-8'))
+            c.send(r)
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 
