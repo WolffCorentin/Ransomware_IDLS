@@ -145,5 +145,3 @@ for ent in lv:
     print(msg_builder)
 print(message.list_victim_end())
 '''
-
-print(history_req('2'))

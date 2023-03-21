@@ -17,6 +17,7 @@ import json
 # Classes & Functions
 # --------------------------------------------
 
+
 def get_ip(path):
     """
     Fonctions pour récupérer des données en configuration
@@ -49,6 +50,7 @@ def get_port(path):
     # On renvoie la donnée port
     return data['port_server']
 
+
 def get_specific_data(path, cdata):
     """
         Fonction pour récupérer des données en configuration
@@ -63,3 +65,15 @@ def get_specific_data(path, cdata):
         confile.close()
     # On renvoie la donnée port
     return data[cdata]
+
+
+def set_specific_data_value(path, key, value):
+    with open(path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    jsonFile.close()
+    data[key] = value
+
+    with open(path, "w+") as jFile:
+        jFile.write(json.dumps(data))
+    jFile.close()
+
