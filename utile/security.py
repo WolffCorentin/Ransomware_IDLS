@@ -43,8 +43,4 @@ class SecurityLayer(object):
 def decrypt(ciphertexta, key):
     #(ciphertext, authTag, nonce) = ciphertexta
     encobj = AES.new(key, AES.MODE_GCM)
-    print(key)
-    print(type(key))
-    print(ciphertexta)
-    print(type(ciphertexta))
     return encobj.decrypt(ciphertexta)
