@@ -46,7 +46,10 @@ class server_tcp(object):
         c.sendall(serialized_payload)
 
     def receive_data(self, c, HEADERSIZE=10):
-        data_size = int(c.recv(HEADERSIZE)[0:HEADERSIZE])
+        data_size = c.recv(HEADERSIZE)
+        if not data_size:
+            return None
+        data_size = int(data_size)
         received_payload = b""
         reamining_payload_size = data_size
         while reamining_payload_size != 0:
@@ -119,7 +122,7 @@ class server_tcp(object):
         # Todo: Mettre en place le cryptage
         while True:
             data = self.receive_data(c)
-            if not data:
+            if data == b'' or data is None:
                 print(sc[0] + ':' + str(sc[1]) + ' >> connexion closed.')
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
                 print_lock.release()
