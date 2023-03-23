@@ -49,7 +49,7 @@ class server_tcp(object):
         data_size = c.recv(HEADERSIZE)
         if not data_size:
             return None
-        data_size = int(data_size)
+        data_size = int(float(data_size))
         received_payload = b""
         reamining_payload_size = data_size
         while reamining_payload_size != 0:
@@ -117,7 +117,9 @@ class server_tcp(object):
         # Sécurisé de manière différente (différents nonce, key, authtag)
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
-        self.send_data(c, 'Todo')
+        sec_key = security.gen_key(16)
+        print(sec_key)
+        self.send_data(c, sec_key)
         #c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
         # Todo: Mettre en place le cryptage
         while True:
@@ -127,14 +129,17 @@ class server_tcp(object):
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
                 print_lock.release()
                 break
+            cryptMsg = pickle.loads(data)
+            clearMsg = security.decrypt(cryptMsg, sec_key)
             # On print l'ip de la connexion et sa demande
-            print(str(sc[0] + ':' + str(sc[1]) + " >> " + str(data)))
+            print(str(sc[0] + ':' + str(sc[1]) + " >> " + str(clearMsg)))
             # On construit une réponse grâce à la méthode gestion message
-            rs = self.gestion_msg(c, data)
+            rs = self.gestion_msg(c, clearMsg)
+            r = security.crypt(rs, sec_key)
+            payload = pickle.dumps(r)
             # @Todo: Build header & send it before msg
-            #r = sec.encrypt(pickle.dumps(rs))
             # On l'envoie
-            self.send_data(c, rs)
+            self.send_data(c, payload)
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
 

