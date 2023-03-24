@@ -26,7 +26,6 @@ def main():
     # de vouloir check un historique.
     hasAsked = False
     key_f = receive_data(s)
-    print(key_f)
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
         print('CONSOLE DE CONTRÔLE'

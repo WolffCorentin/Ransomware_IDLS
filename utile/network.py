@@ -118,7 +118,6 @@ class server_tcp(object):
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
         sec_key = security.gen_key(16)
-        print(sec_key)
         self.send_data(c, sec_key)
         #c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
         # Todo: Mettre en place le cryptage
