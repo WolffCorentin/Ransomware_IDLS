@@ -16,7 +16,7 @@ from _thread import start_new_thread
 
 import configgetter as config
 import security
-import json
+import queue
 import utile.data as udata
 import message
 import pickle
@@ -26,16 +26,18 @@ import pickle
 # --------------------------------------------
 
 print_lock = threading.Lock()
-
+q1 = queue.Queue()
+clients = {}
 
 class server_tcp(object):
 
 
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, port2):
         """ Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
         """
         self.ip = ip
         self.port = port
+        self.port2 = port2
 
     def send_data(self, c, message, HEADERSIZE=10):
         """
@@ -59,34 +61,43 @@ class server_tcp(object):
         return payload
 
 
+    def accept_con(self, conn):
+        connexion, addr = conn.accept()
+        q1.put(connexion)
+
     def start_server(self):
         """
         Démarrage du serveur et maintient de celui-ci + gestion des 'commandes'
         """
         # Création de la socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print(f'$ Server started ! Waiting for clients...')
         try:
             # Debug & Prevent crash
             s.bind((self.ip, self.port))
+            s2.bind((self.ip, self.port2))
         except socket.error as error:
             print(str(error))
-        # Max 10 clients
         s.listen(10)
+        s2.listen(10)
         while True:
             # On accepte les connexions
-            conn, addr = s.accept()
-            # Ok
-            print_lock.acquire()
-            print(f'[+] New TCP Connexion from ' + str(addr[0]) + ":" + str(addr[1]))
+            t1 = threading.Thread(target=self.accept_con, args=(s,))
+            t2 = threading.Thread(target=self.accept_con, args=(s2,))
+            t1.start()
+            t2.start()
+            conn = q1.get()
+            addr = conn.getpeername()
+            clients[addr] = conn
+            print(f'[+] {str(addr[0])}:{str(addr[1])}')
             # Nouvelle connexion détectée : On créé un thread pour celle-ci
-            start_new_thread(self.threaded, (conn, addr))
-        # Implémentation sécurité : AES
-        # conn.send(bytes(str(key), 'utf-8'))
-        # conn.send(bytes(str(nonce), 'utf-8'))
-        # conn.send(bytes(str(tag), 'utf-8'))
+            client_thread = threading.Thread(target=self.threaded, args=(conn, addr))
+            client_thread.start()
+            #start_new_thread(self.threaded, (conn, addr))
         # Fermeture de la connexion
-        self.s.close()
+        s.close()
+        s2.close()
 
     def gestion_msg(self, c, msg):
         """
@@ -111,6 +122,7 @@ class server_tcp(object):
         """
         Système de création de Threads..
         """
+        print('[FiFo] Implemented')
         print('New thread started')
         print('[SecurityLayerAES]Generating Security Parameters...')
         # On initialise un protocole de sécurité AES par thread pour
@@ -126,7 +138,6 @@ class server_tcp(object):
             if data == b'' or data is None:
                 print(sc[0] + ':' + str(sc[1]) + ' >> connexion closed.')
                 # Suppression du thread + Reset connexion TCP --> Suppression Thread = Force close de la connexion
-                print_lock.release()
                 break
             cryptMsg = pickle.loads(data)
             clearMsg = security.decrypt(cryptMsg, sec_key)
@@ -141,10 +152,11 @@ class server_tcp(object):
             self.send_data(c, payload)
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
+        clients.pop(sc)
 
 
 # On initialise l'objet serveur avec les paramètres ip et port contenu dans le fichier config
 # Pour éviter le hard-coding et des modifications plus aisée...
-srv = server_tcp(config.get_ip("../config.json"), config.get_port("../config.json"))
+srv = server_tcp(config.get_ip("../config.json"), config.get_port("../config.json"), config.get_specific_data("../config.json", "second_port_server"))
 # On démarre le serveur
 srv.start_server()
