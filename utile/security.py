@@ -11,7 +11,7 @@ from Cryptodome.Cipher import AES
 from Crypto.Util.Padding import pad
 from Crypto.Util.Padding import unpad
 from Cryptodome.Random import get_random_bytes
-import pickle, binascii
+import pickle
 
 
 # --------------------------------------------
@@ -33,3 +33,5 @@ def decrypt(cryptMsg, key):
     cipher = AES.new(key, AES.MODE_GCM, nonce=cryptMsg[0])
     cipher.update(cryptMsg[1])
     return pickle.loads(unpad(cipher.decrypt_and_verify(cryptMsg[2], cryptMsg[3]), AES.block_size))
+
+

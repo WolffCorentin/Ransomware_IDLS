@@ -1,7 +1,7 @@
 import json
 import configgetter
 import security
-import binascii
+import pickle
 
 JSON_FILENAME = configgetter.get_specific_data('../config.json', 'json_file_name')
 dictionnaire = {"nom": "John", "age": 30, "ville": "Paris"}
@@ -25,38 +25,52 @@ def add_json(dictionnaire, JSON_FILENAME):
     return dataset
 
 
-def read_json(JSON_FILENAME):
+def read_json(JSON_FILENAME):   
     """
     Lit un dictionnaire encodé en JSON depuis un fichier et le retourne.
     """
-    with open(JSON_FILENAME, "r") as f:
+    with open(JSON_FILENAME, "rb") as f:
         dataset = json.load(f)
     f.close()
     return dataset
 
-"""
-def chiffrer_fichier(JSON_FILENAME):
-        
-    dataset = read_json(JSON_FILENAME)
-    sec = security.SecurityLayer()
-    datasetciphered = sec.encrypt(dataset)
-    datasetciphered = json.dumps(datasetciphered)
-    write_json(datasetciphered)
-    configgetter.set_specific_data_value(JSON_FILENAME, 'json_file_key', str(binascii.hexlify(sec.key)))
-    return "Json file has been encrypted"
+
+def crypt_file(key, FILE_NAME, FILENAMEKEY):
+    sk = save_key(key, FILENAMEKEY)
+    print(sk)
+    with open(FILE_NAME, "rb") as f:
+        dataset = f.read()
+    f.close()
+    encrypted = security.crypt(dataset, key)
+    with open(FILE_NAME, "wb") as fw:
+        fw.write(pickle.dumps(encrypted))
+    fw.close()
+    return "File encrypted"
 
 
-def dechiffrer_fichier(JSON_FILENAME):
-
-    Déchiffrer un fichier
-    
-    key = configgetter.get_specific_data(JSON_FILENAME, 'json_file_key')
-    dataset = read_json(JSON_FILENAME)
+def decrypt_file(KEYFILE, FILENAME):
+    key = get_key(KEYFILE)
+    with open(FILENAME, "rb") as f:
+        dataset = f.read()
+    f.close()
+    dataset = pickle.loads(dataset)
     decrypted = security.decrypt(dataset, key)
-    return str(decrypted)
+    with open(FILENAME, "wb") as fw:
+        fw.write(decrypted)
+    fw.close()
+    return "File decrypted"
 
 
-print(write_json(dictionnaire, JSON_FILENAME))
-print(read_json(JSON_FILENAME))
-chiffrer_fichier(JSON_FILENAME)
-"""
+def save_key(key, FILE_NAME):
+    with open(FILE_NAME, "wb") as fw:
+        fw.write(key)
+    fw.close()
+    return f"Key has been stored in file {str(FILE_NAME)}"
+
+
+def get_key(FILENAMEKEY):
+    with open(FILENAMEKEY, "rb") as f:
+        dataset = f.read()
+    f.close()
+    return dataset
+

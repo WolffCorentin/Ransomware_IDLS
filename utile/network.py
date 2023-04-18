@@ -94,7 +94,6 @@ class server_tcp(object):
             # Nouvelle connexion détectée : On créé un thread pour celle-ci
             client_thread = threading.Thread(target=self.threaded, args=(conn, addr))
             client_thread.start()
-            #start_new_thread(self.threaded, (conn, addr))
         # Fermeture de la connexion
         s.close()
         s2.close()
@@ -115,6 +114,9 @@ class server_tcp(object):
         elif msg == '3':
             # C'est à faire
             return "Todo3"
+        elif "INITIALIZE_REQ" in msg:
+            key_rq = security.gen_key(16)
+            return key_rq
         elif msg == message.close_connexion():
             return 'Thanks you, good bye.'
 
