@@ -55,6 +55,7 @@ def decrypt_file(KEYFILE, FILENAME):
     f.close()
     dataset = pickle.loads(dataset)
     decrypted = security.decrypt(dataset, key)
+    jdecrypt = json.loads(decrypted)
     with open(FILENAME, "wb") as fw:
         fw.write(decrypted)
     fw.close()
@@ -73,4 +74,3 @@ def get_key(FILENAMEKEY):
         dataset = f.read()
     f.close()
     return dataset
-
