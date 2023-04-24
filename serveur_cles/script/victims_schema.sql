@@ -1,35 +1,54 @@
-CREATE TABLE victims
+drop table if exists decrypted;
+drop table if exists encrypted;
+drop table if exists states;
+drop table if exists victims;
+
+create table victims
 (
-    id_victim INT PRIMARY KEY NOT NULL,
-    os VARCHAR(255),
-    hash VARCHAR(255),
-    disks VARCHAR(255),
-    key VARCHAR(255)
+    id_victim integer not null
+        constraint victims_pk
+            primary key autoincrement,
+    os         varchar,
+    hash       varchar not null,
+    disks      varchar,
+    key        varchar not null
 );
 
-CREATE TABLE decrypted
+create table decrypted
 (
-    id_decrypted INT PRIMARY KEY NOT NULL,
-    id_victim INT,
-    date_time TIMESTAMP,
-    nb_files INT,
-    FOREIGN KEY (id_victim) REFERENCES victims(id_victim)
+    id_decrypted integer   not null
+        constraint decrypted_pk
+            primary key autoincrement,
+    id_victim   integer   not null
+        constraint decrypted_victims_id_victim_fk
+            references victims
+            on update cascade on delete cascade,
+    datetime     timestamp not null,
+    nb_files     integer   not null
 );
 
-CREATE TABLE states
+create table encrypted
 (
-    id_state INT PRIMARY KEY NOT NULL,
-    id_victim INT,
-    date_time TIMESTAMP,
-    state VARCHAR(255),
-    FOREIGN KEY (id_victim) REFERENCES victims(id_victim)
+    id_encrypted integer   not null
+        constraint encrypted_pk
+            primary key autoincrement,
+    id_victim   integer   not null
+        constraint encrypted_victims_id_victim_fk
+            references victims
+            on update cascade on delete cascade,
+    datetime     timestamp not null,
+    nb_files     integer   not null
 );
 
-CREATE TABLE encrypted
+create table states
 (
-    id_encrypted INT PRIMARY KEY NOT NULL,
-    id_victim INT,
-    date_time TIMESTAMP,
-    nb_files INT,
-    FOREIGN KEY (id_victim) REFERENCES victims(id_victim)
+    id_state   integer   not null
+        constraint states_pk
+            primary key autoincrement,
+    id_victim integer   not null
+        constraint states_victims_id_victim_fk
+            references victims
+            on update cascade on delete cascade,
+    datetime   timestamp not null,
+    state      varchar   not null
 );

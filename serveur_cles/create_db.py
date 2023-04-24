@@ -1,8 +1,8 @@
 import os
 import sqlite3
 
-DB_FILENAME = './data/victims.sqlite'
-SCHEMA_FILENAME = './script/victims_schema.sql'
+DB_FILENAME = 'data/victims.sqlite'
+SCHEMA_FILENAME = 'script/victims_schema.sql'
 
 db_is_new = not os.path.exists(DB_FILENAME)
 

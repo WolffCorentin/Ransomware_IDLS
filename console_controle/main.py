@@ -45,7 +45,7 @@ def main():
             payload_f = pickle.dumps(r)
             #s.send(d.encode('utf-8'))
             send_data(s, payload_f)
-            # On récupère la réponse en écoutant
+            # On rée la réponse en écoutant
             data = receive_data(s)
             cryptMsg = pickle.loads(data)
             clearMsg = security.decrypt(cryptMsg, key_f)
