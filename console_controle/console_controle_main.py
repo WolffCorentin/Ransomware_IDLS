@@ -19,14 +19,13 @@ def main():
     # Création de la socket de connexion
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # On se connecte
-    s.connect((config.get_ip("config.json"), config.get_port("config.json")))
+    s.connect((config.get_ip("../config.json"), config.get_port("../config.json")))
     # 19 ainsi il est initalisé à une variable impossible à atteindre
     choix = "19"
     # hasAsked 1 Before = Check si il a demander un listing avant
     # de vouloir check un historique.
     hasAsked = False
     key_f = security.diffie_hellman_recv_key(s)
-    print(key_f)
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
         print('CONSOLE DE CONTRÔLE'
