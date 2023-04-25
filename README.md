@@ -6,7 +6,7 @@ Basics Github :
 - Pour recevoir les update : Update
 
 To run the project :
-- Run utile/network.py
-- Run utile/second_network.py
-- Run utile/serveur_frontale.py
-- Run console_controle/main.py
+- Run key_server_runner.py
+- Run frontal_server_runner.py
+- Run controle_console_runner.py
+
