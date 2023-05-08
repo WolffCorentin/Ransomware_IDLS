@@ -4,6 +4,8 @@
   "second_port_server": 8381,
   "frontal_server_ip": "localhost",
   "frontal_server_port": 8382,
+  "key_server_ip": "localhost",
+  "key_server_port": 8383,
   "victim_database": "serveur_cles/data/victims.sqlite",
   "json_file_name": "../serveur_cles/data/test.json",
   "json_file_key": ""

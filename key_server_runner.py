@@ -1,4 +1,4 @@
-import utile.network as network
+import serveur_cles.serveur_cles as network
 import utile.configgetter as config
 
 # On initialise l'objet serveur avec les paramètres ip et port contenu dans le fichier config
