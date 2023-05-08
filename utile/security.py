@@ -25,12 +25,14 @@ def gen_key(size=16):
     key = get_random_bytes(size)
     return key
 
+
 def crypt(textMsg, key):
     header = b"header_AES_GCM"
     cipher = AES.new(key, AES.MODE_GCM)
     cipher.update(header)
     ciphertext, tag = cipher.encrypt_and_digest(pad(pickle.dumps(textMsg), AES.block_size))
     return [cipher.nonce, header, ciphertext, tag]
+
 
 def decrypt(cryptMsg, key):
     cipher = AES.new(key, AES.MODE_GCM, nonce=cryptMsg[0])
@@ -63,6 +65,7 @@ def diffie_hellman_recv_key(conn_srv):
     send_msg(conn_srv, {'B': (g ** secret_key_b) % p})
 
     return sha256(str(key_calculate_b).encode()).digest()
+
 
 def send_msg(c, message, HEADERSIZE=10):
     """

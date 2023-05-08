@@ -25,8 +25,8 @@ print_lock = threading.Lock()
 q1 = queue.Queue()
 clients = {}
 
-class server_tcp(object):
 
+class server_tcp(object):
 
     def __init__(self, ip, port, port2):
         """ Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
@@ -55,7 +55,6 @@ class server_tcp(object):
             reamining_payload_size = data_size - len(received_payload)
         payload = pickle.loads(received_payload)
         return payload
-
 
     def accept_con(self, conn):
         connexion, addr = conn.accept()
@@ -151,6 +150,4 @@ class server_tcp(object):
         # On ferme la connexion du client lors de la fin de connexion
         c.close()
         clients.pop(sc)
-
-
 

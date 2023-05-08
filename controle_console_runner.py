@@ -1,3 +1,3 @@
-import console_controle.console_controle_main as console
+import console_controle.console_controle as console
 
 console.main()

