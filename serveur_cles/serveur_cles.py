@@ -4,7 +4,6 @@ import utile.security as security
 import queue
 import utile.data as udata
 import utile.message as message
-import pickle
 from utile.network import recv_msg, send_msg
 
 print_lock = threading.Lock()
