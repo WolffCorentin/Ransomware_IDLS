@@ -98,3 +98,36 @@ def get_data_config(data):
     else:
         return None
 
+
+def set_config(key, value):
+    global config
+    config[key] = value
+
+
+def print_config():
+    print(json.dumps(config, indent=4))
+
+def reset_config():
+    global config
+    config.clear()
+
+
+def remove_config(key):
+    global config
+    if key in config.keys():
+        config.pop(key)
+
+
+def save_config(config_file, key_file):
+    global config
+    if config != {}:
+        key = security.gen_key(32)
+        with open(key_file, 'wb') as k:
+            k.write(key)
+
+        data = json.dumps(config)
+        data = security.crypt(data, key)
+        data = pickle.dumps(data)
+        with open(config_file, 'wb') as cf:
+            cf.write(data)
+
