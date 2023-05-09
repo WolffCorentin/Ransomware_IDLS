@@ -73,11 +73,11 @@ class server_tcp(object):
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
             return udata.history_req(conn, msg[-3:-2])
-        elif msg == '3':
+        elif msg == 'CHANGE_STATE':
             # C'est à faire
             return "Todo3"
         elif "INITIALIZE_REQ" in msg:
-            key_rq = security.gen_key(16)
+            key_rq = security.gen_key(512)
             return key_rq
         elif msg == message.close_connexion():
             return 'Thanks you, good bye.'

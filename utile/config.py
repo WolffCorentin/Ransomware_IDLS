@@ -1,10 +1,13 @@
 import json
-import configgetter
-import security
+import utile.configgetter as configgetter
+import utile.security as security
 import pickle
 
-JSON_FILENAME = configgetter.get_specific_data('../config.json', 'json_file_name')
+JSON_FILENAME = configgetter.get_specific_data('config.json', 'json_file_name')
 dictionnaire = {"nom": "John", "age": 30, "ville": "Paris"}
+
+global config
+
 
 def write_json(dictionnaire, JSON_FILENAME):
     """
@@ -74,3 +77,24 @@ def get_key(FILENAMEKEY):
         dataset = f.read()
     f.close()
     return dataset
+
+
+def load_config(config_path, key_path):
+    global config
+    with open(key_path, 'rb') as f:
+        key = f.read()
+    with open(config_path, 'rb') as cf:
+         config_content = cf.read()
+    data = pickle.loads(config_content)
+    data = security.decrypt(data, key)
+    config = json.loads(data)
+    return config
+
+
+def get_data_config(data):
+    global config
+    if config[data] is not None:
+        return config[data]
+    else:
+        return None
+

