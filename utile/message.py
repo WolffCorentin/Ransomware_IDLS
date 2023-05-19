@@ -25,7 +25,8 @@ MESSAGE_TYPE = {
     'CHGSTATE': 'CHANGE_STATE',
     'INITIALIZE': 'INITIALIZE_REQ',
     'KEY_RESP': 'INITIALIZE_KEY',
-    'CONFIGURE': 'INITIALIZE_RESP'
+    'CONFIGURE': 'INITIALIZE_RESP',
+    'CLOSE_TCP': 'GOOD BYE'
 }
 
 
@@ -84,10 +85,10 @@ def history_end(id):
 
     return hejson
 
-def change_state(id, state):
+def change_state(id):
     change_state = {
         'CHGSTATE': id,
-        'STATE': state
+        'STATE': 'DECRYPT'
     }
     csjson = json.dumps(change_state)
 
@@ -121,7 +122,7 @@ def initialize_key(id, key, state):
 
     return ikjson
 
-def initialize_resp(id, disks, paths, file_exit, freq, key, state):
+def initialize_resp(id, disks, paths, file_exit, freq, key):
     initialize_resp = {
         'CONFIGURE': id,
         'SETTING': {
@@ -130,7 +131,6 @@ def initialize_resp(id, disks, paths, file_exit, freq, key, state):
             'FILE_EXIT': file_exit,
             'FREQ': freq,
             'KEY': key,
-            'STATE': state
         }
     }
     irjson = json.dumps(initialize_resp)
@@ -168,7 +168,7 @@ def get_message(select_msg, params=None):
     if select_msg.upper() == 'CHANGE_STATE':
         if len(params) != 1:
             return None
-        return change_state(params[0], params[1])
+        return change_state(params[0])
 
     if select_msg.upper() == 'INITIALIZE_REQ':
         if len(params) != 3:
@@ -180,6 +180,9 @@ def get_message(select_msg, params=None):
             return None
         return initialize_key(params[0], params[1], params[2])
 
+    if select_msg.upper() == 'CLOSE_TCP':
+        return "Good Bye"
+
     if select_msg.upper() == 'INITIALIZE_RESP':
         if len(params) != 6:
             return None
@@ -189,3 +192,7 @@ def get_message_type(message):
     message = json.loads(message)
     first_key = list(message.keys())[0]
     return MESSAGE_TYPE[first_key]
+
+def get_message_type_t(message):
+    first_element = message[0]
+    return MESSAGE_TYPE[first_element]

