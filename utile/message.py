@@ -186,5 +186,6 @@ def get_message(select_msg, params=None):
         return initialize_resp(params[0], params[1], params[2], params[3], params[4], params[5])
 
 def get_message_type(message):
+    message = json.loads(message)
     first_key = list(message.keys())[0]
     return MESSAGE_TYPE[first_key]

