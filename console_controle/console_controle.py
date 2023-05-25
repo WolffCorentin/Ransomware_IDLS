@@ -28,7 +28,7 @@ def main():
     """ Console de contrôle """
     global key
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((config.get_ip("C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/config.json"), config.get_port("C:/Users/coren/PycharmProjects/UE14-1IS4-Groupe1/config.json")))
+    s.connect((config.get_ip("config.json"), config.get_port("config.json")))
     choix = None
     hasAsked = False
     key_f = security.diffie_hellman_recv_key(s)
