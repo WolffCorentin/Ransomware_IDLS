@@ -1,3 +1,12 @@
+# --------------------------------------------
+# Ransomware Project for educational purposes
+# Course : Security integration
+# Bloc : 1
+# Group : IS4
+# Class : config
+# --------------------------------------------
+# Importations
+# --------------------------------------------
 import json
 import utile.configgetter as configgetter
 import utile.security as security

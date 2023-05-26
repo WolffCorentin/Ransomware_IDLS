@@ -10,7 +10,6 @@ from utile import security
 import utile.configgetter as config
 from utile import message
 from utile import input as custom_input
-import pickle
 from utile.network import send_msg, recv_msg
 
 
