@@ -3,7 +3,6 @@ import os
 import socket
 import string
 from time import time
-from hashlib import sha256
 from platform import node, win32_edition, system
 from re import search
 from os import path
