@@ -5,14 +5,13 @@ This project was created for educational purposes and was supervised by the Haut
 The author and contributors are not responsible for any misuse or consequences resulting from the use of this project. Users are advised to use this project responsibly and in accordance with ethical and legal standards.
 
 ## Documentation - Incomming
-- [Main Project PDF]()
-- [Lab 1 PDF]()
-- [Lab 2 PDF]()
-- [Lab 3 PDF]()
-- [Lab 4 PDF]()
-- [Lab 5 PDF]()
+- [Main Project PDF](https://corentin-wolff.com/pdfs/enonce.pdf)
+- [Lab 2 PDF](https://corentin-wolff.com/pdfs/Labo2.pdf)
+- [Lab 3 PDF](https://corentin-wolff.com/pdfs/Labo3.pdf)
+- [Lab 4 PDF](https://corentin-wolff.com/pdfs/Labo4.pdf)
+- [Lab 5 PDF](https://corentin-wolff.com/pdfs/Labo5.pdf)
 - [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/)
-- [AES GCM example]()
+- [GCM example](https://en.wikipedia.org/wiki/Galois/Counter_Mode)
 
 # Instructions for Running the Project
 - Run key_server_runner.py first.
