@@ -4,7 +4,7 @@ This project was created for educational purposes and was supervised by the Haut
 # Disclaimer:
 The author and contributors are not responsible for any misuse or consequences resulting from the use of this project. Users are advised to use this project responsibly and in accordance with ethical and legal standards.
 
-## Documentation - Incomming
+## Documentation
 - [Main Project PDF](https://corentin-wolff.com/pdfs/enonce.pdf)
 - [Lab 2 PDF](https://corentin-wolff.com/pdfs/Labo2.pdf)
 - [Lab 3 PDF](https://corentin-wolff.com/pdfs/Labo3.pdf)
