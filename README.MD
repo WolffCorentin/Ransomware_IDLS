@@ -5,6 +5,7 @@ This project was created for educational purposes and was supervised by the Haut
 The author and contributors are not responsible for any misuse or consequences resulting from the use of this project. Users are advised to use this project responsibly and in accordance with ethical and legal standards.
 
 ## Documentation - Incomming
+- [Main Project PDF]()
 - [Lab 1 PDF]()
 - [Lab 2 PDF]()
 - [Lab 3 PDF]()
@@ -12,7 +13,6 @@ The author and contributors are not responsible for any misuse or consequences r
 - [Lab 5 PDF]()
 - [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/)
 - [AES GCM example]()
-- [Main Project PDF]()
 
 # Instructions for Running the Project
 - Run key_server_runner.py first.
