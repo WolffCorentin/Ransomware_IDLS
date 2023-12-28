@@ -28,3 +28,4 @@ The author and contributors are not responsible for any misuse or consequences r
 
 # Contributor
 - Dorian Vrancken
+- Maxime Crucifix
