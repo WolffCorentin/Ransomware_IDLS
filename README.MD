@@ -19,13 +19,13 @@ The author and contributors are not responsible for any misuse or consequences r
 - After that, run controle_console_runner.py.
 - Finally, execute ransomware_runner.py.
 
-# Project Supervisors
-- Francis Vermeire
-- François Goerlich
+# Project Supervisors - Idea Authors
+- According to an original idea by [Christophe Mangon](https://be.linkedin.com/in/christophe-mangon)
+- [@Francis Vermeire](https://be.linkedin.com/in/francisvermeire) 
+- [@François Goerlich][] # Link Incomming
 
-# Author
+# Code Author
 - [@Wolff Corentin](https://www.github.com/WolffCorentin)
 
 # Contributor
 - Dorian Vrancken
-- Maxime Crucifix
