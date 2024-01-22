@@ -21,11 +21,11 @@ The author and contributors are not responsible for any misuse or consequences r
 
 # Project Supervisors - Idea Authors
 - According to an original idea by [Christophe Mangon](https://be.linkedin.com/in/christophe-mangon)
-- [@Francis Vermeire](https://be.linkedin.com/in/francisvermeire) 
-- [@François Goerlich][] # Link Incomming
+- [Francis Vermeire](https://be.linkedin.com/in/francisvermeire) 
+- [François Goerlich][] # Link Incomming
 
 # Code Author
-- [@Wolff Corentin](https://www.github.com/WolffCorentin)
+- [Wolff Corentin](https://www.github.com/WolffCorentin)
 
 # Contributor
 - Dorian Vrancken
